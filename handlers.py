@@ -9,7 +9,7 @@ from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 from states.bin_lookup import RoyalMailStates
 import uuid
-
+import os
 import io
 
 router = Router()
