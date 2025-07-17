@@ -11,7 +11,16 @@ router = Router()
 async def cmd_start(msg: Message):
     await register_user(msg.from_user.id, msg.from_user.username)
     balance = await get_balance(msg.from_user.id)
-    await msg.answer(f"💰 Your balance: £{balance}", reply_markup=main_menu())
+    user_name = msg.from_user.full_name or msg.from_user.username or "User"
+
+    text = (
+        f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
+        f"💰 Your balance: £{balance}\n\n"
+        "Harness the power of hidden tools at your command.\n"
+        "Type /help to begin."
+    )
+    await msg.answer(text, parse_mode="Markdown", reply_markup=main_menu())
+
 
 @router.callback_query(F.data == "bin_lookup")
 async def bin_lookup(cb: CallbackQuery):
