@@ -195,14 +195,14 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 
 
 # ===== Button click triggers FSM =====
-@dp.callback_query(F.data == "royalmail_charger")
+@router.callback_query(F.data == "royalmail_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RoyalMailStates.awaiting_cards)
     await callback.message.answer("Please send the card(s), one per line:")
     await callback.answer()
 
 # ===== User sends card list =====
-@dp.message(RoyalMailStates.awaiting_cards)
+@router.message(RoyalMailStates.awaiting_cards)
 async def handle_card_list(message: Message, state: FSMContext):
     cards = [line.strip() for line in message.text.splitlines() if line.strip()]
     if not cards:
