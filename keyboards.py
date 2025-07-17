@@ -4,6 +4,7 @@ def main_menu():
     kb = InlineKeyboardBuilder()
     kb.button(text="Advanced BIN Lookup", callback_data="bin_lookup")
     kb.button(text="OvO Charger", callback_data="ovo_charger")
+    kb.adjust(1)  # Each button takes 1 row
     return kb.as_markup()
 
 def back_menu():
