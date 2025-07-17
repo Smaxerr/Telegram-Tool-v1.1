@@ -194,15 +194,35 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-@router.callback_query(F.data == "ovo_charger")
-async def handle_ovo_charger(callback: CallbackQuery):
-    msg = await callback.message.answer("⚡ Charging OvO... Please wait.")
-    try:
-        path = await screenshot_ovo()
-        await msg.delete()
-        await callback.message.answer_photo(FSInputFile(path), caption="🔋 OvO Charger ready!")
-    except Exception as e:
-        await msg.edit_text(f"❌ Error charging OvO:\n`{e}`", parse_mode="Markdown")
+# ===== Button click triggers FSM =====
+@dp.callback_query(F.data == "royalmail_charger")
+async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(RoyalMailStates.awaiting_cards)
+    await callback.message.answer("Please send the card(s), one per line:")
+    await callback.answer()
+
+# ===== User sends card list =====
+@dp.message(RoyalMailStates.awaiting_cards)
+async def handle_card_list(message: Message, state: FSMContext):
+    cards = [line.strip() for line in message.text.splitlines() if line.strip()]
+    if not cards:
+        await message.answer("❌ No cards found. Please send again.")
+        return
+
+    await message.answer(f"🔍 Received {len(cards)} card(s). Starting...")
+
+    for idx, card in enumerate(cards, start=1):
+        await message.answer(f"📦 Processing card {idx}: `{card}`", parse_mode="Markdown")
+        screenshot_path = await take_royalmail_screenshot(card)
+
+        if screenshot_path:
+            await message.answer_photo(FSInputFile(screenshot_path))
+            os.remove(screenshot_path)
+        else:
+            await message.answer(f"❌ Failed to process card `{card}`")
+
+    await message.answer("✅ All done.")
+    await state.clear()
 
 
 @router.callback_query(F.data == "back_main")
