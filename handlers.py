@@ -16,7 +16,6 @@ async def cmd_start(msg: Message):
     text = (
         f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
         f"💰 Your balance: £{balance}\n\n"
-        "Harness the power of hidden tools at your command.\n"
         "Type /help to begin."
     )
     await msg.answer(text, parse_mode="Markdown", reply_markup=main_menu())
