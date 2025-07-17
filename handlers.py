@@ -36,7 +36,7 @@ async def back_main(cb: CallbackQuery):
     username = cb.from_user.username or "NoUsername"
     
     text = (
-        f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
+        f"🔐 Welcome to *CipherBot*, {username}.\n\n"
         f"💰 Your balance: £{balance}\n\n"
         "Use the menu below to continue."
     )
