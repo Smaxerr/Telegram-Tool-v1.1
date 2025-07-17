@@ -1,5 +1,4 @@
 from playwright.async_api import async_playwright
-from playwright_stealth import stealth_async
 
 # ===== Take screenshot using Playwright =====
 async def take_royalmail_screenshot(card: str) -> str:
