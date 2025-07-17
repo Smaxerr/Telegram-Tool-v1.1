@@ -54,7 +54,7 @@ async def bin_lookup(message: Message, state: FSMContext):
         await register_user(user_id, username)
         user_balance = 0
 
-    if user_balance < 0.1:
+    if user_balance < 0.01:
         await message.answer(
             "❌ Insufficient balance to perform BIN lookup.",
             reply_markup=binlookupbutton
@@ -63,7 +63,7 @@ async def bin_lookup(message: Message, state: FSMContext):
         return
 
     # Deduct £0.10 from balance
-    new_balance = user_balance - 0.1
+    new_balance = user_balance - 0.01
     if new_balance < 0:
         new_balance = 0
     await set_balance(user_id, new_balance)
