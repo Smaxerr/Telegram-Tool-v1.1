@@ -1,8 +1,7 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, InputFile
 from config import ADMIN_IDS
 from io import BytesIO
-from aiogram.types import InputFile
 from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 import io
@@ -71,11 +70,12 @@ async def add_balance_cmd(msg: Message):
 
 @router.message(F.text == "/viewusers")
 async def view_users(msg: Message):
-    users = await get_all_users()
-    content = ""
-    for user in users:
-        content += f"{user['id']} | {user['username']} | {user['balance']}\n"
+    users = await get_all_users()  # your function returning list of user dicts
+    text = "\n".join(f"{u['id']} @{u['username']} £{u['balance']}" for u in users)
 
-    bio = BytesIO(content.encode("utf-8"))
-    bio.name = "users.txt"
+    # Convert to bytes (UTF-8) and wrap in BytesIO
+    bio = io.BytesIO(text.encode('utf-8'))
+    bio.name = "users.txt"  # set filename attribute so Telegram knows the filename
+
+    # Send as document
     await msg.answer_document(InputFile(bio))
