@@ -239,7 +239,7 @@ async def take_royalmail_screenshot(card: str) -> str:
             user_data_dir = "/tmp/playwright-profile"
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=user_data_dir,
-                headless=False,  # use True for prod; False for debug
+                headless=True,  # use True for prod; False for debug
                 args=["--no-sandbox"]
             )
             page = await browser.new_page()
