@@ -38,7 +38,7 @@ from aiogram.fsm.context import FSMContext
 from database import register_user, get_balance, set_balance
 from states import BinLookupState  # your FSM states module
 
-CSV_URL = "https://example.com/bin_database.csv"  # Replace with your actual URL
+CSV_URL = "https://github.com/venelinkochev/bin-list-data/blob/master/bin-list-data.csv"  # Replace with your actual URL
 binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
 ])
