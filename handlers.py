@@ -120,14 +120,6 @@ async def bin_lookup(message: Message, state: FSMContext):
                     f"💻 Type: {r.get('Type', 'N/A')}\n"
                     f"📂 Category: {r.get('Category', 'N/A')}"
                 )
-                msg = await message.answer(
-                    response,
-                    reply_markup=InlineKeyboardMarkup(
-                        inline_keyboard=[
-                            [InlineKeyboardButton(text="🔎 Search Another BIN"]
-                        ]
-                    )
-                )
                 await state.update_data(result_msg_id=msg.message_id)
 
             else:
