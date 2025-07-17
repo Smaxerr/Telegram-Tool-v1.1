@@ -38,6 +38,8 @@ from aiogram.fsm.context import FSMContext
 from database import register_user, get_balance, set_balance
 from states import BinLookupState  # your FSM states module
 
+
+
 CSV_URL = "https://raw.githubusercontent.com/venelinkochev/bin-list-data/refs/heads/master/bin-list-data.csv"  # Replace with your actual URL
 binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
@@ -56,8 +58,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
     if user_balance < 0.1:
         await message.answer(
-            "❌ Insufficient balance to perform BIN lookup.",
-            reply_markup=binlookupbutton
+            "❌ Insufficient balance to perform BIN lookup."
         )
         await state.clear()
         return
@@ -85,7 +86,7 @@ async def bin_lookup(message: Message, state: FSMContext):
         async with aiohttp.ClientSession() as session:
             async with session.get(CSV_URL) as resp:
                 if resp.status != 200:
-                    await message.answer("⚠️ Couldn't fetch BIN database.", reply_markup=binlookupbutton)
+                    await message.answer("⚠️ Couldn't fetch BIN database.")
                     await state.clear()
                     return
                 csv_data = await resp.text()
@@ -105,7 +106,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                 rows = df[df['BIN'].astype(str) == user_input]
 
                 if rows.empty:
-                    await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                    await message.answer("❌ No matching UK BINs found.")
                     await state.clear()
                     return
 
@@ -123,14 +124,14 @@ async def bin_lookup(message: Message, state: FSMContext):
                     response,
                     reply_markup=InlineKeyboardMarkup(
                         inline_keyboard=[
-                            [InlineKeyboardButton(text="🔎 Search Another BIN", callback_data="BINlookup_again")]
+                            [InlineKeyboardButton(text="🔎 Search Another BIN"]
                         ]
                     )
                 )
                 await state.update_data(result_msg_id=msg.message_id)
 
             else:
-                await message.answer("❌ Please enter a valid 6-digit BIN.", reply_markup=binlookupbutton)
+                await message.answer("❌ Please enter a valid 6-digit BIN.")
                 await state.clear()
                 return
 
@@ -143,7 +144,7 @@ async def bin_lookup(message: Message, state: FSMContext):
             ]
 
             if rows.empty:
-                await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                await message.answer("❌ No matching UK BINs found.")
                 await state.clear()
                 return
 
@@ -167,7 +168,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                     )
 
             if not output_lines:
-                await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                await message.answer("❌ No matching UK BINs found.")
                 await state.clear()
                 return
 
@@ -177,17 +178,12 @@ async def bin_lookup(message: Message, state: FSMContext):
 
             msg = await message.answer_document(
                 FSInputFile(filepath),
-                caption=f"📄 UK BINs matching: '{user_input}'",
-                reply_markup=InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [InlineKeyboardButton(text="🔎 Search Another BIN", callback_data="BINlookup_again")]
-                    ]
-                )
+                caption=f"📄 UK BINs matching: '{user_input}'"
             )
             await state.update_data(result_msg_id=msg.message_id)
 
     except Exception as e:
-        await message.answer(f"⚠️ Error: {e}", reply_markup=binlookupbutton)
+        await message.answer(f"⚠️ Error: {e}")
         print(f"BIN lookup error: {e}")
 
     await state.clear()
@@ -196,12 +192,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 @router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     prompt = await callback.message.answer(
-        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
-            ]
-        )
+        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):"
     )
     await state.update_data(prompt_id=prompt.message_id)
     await state.set_state(BinLookupState.waiting_for_bin)
