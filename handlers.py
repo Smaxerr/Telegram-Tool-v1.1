@@ -7,6 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
+
 import io
 
 router = Router()
@@ -28,32 +29,48 @@ async def cmd_start(msg: Message):
 # =========================
 # BIN Lookup Handlers
 # =========================
+import aiohttp
+import aiofiles
+import pandas as pd
+from io import StringIO
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile, Message, CallbackQuery
+from aiogram.fsm.context import FSMContext
+from database import register_user, get_balance, set_balance
+from states import BinLookupState  # your FSM states module
+
+CSV_URL = "https://example.com/bin_database.csv"  # Replace with your actual URL
+binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
+])
 
 @router.message(BinLookupState.waiting_for_bin)
 async def bin_lookup(message: Message, state: FSMContext):
     user_id = message.from_user.id
+    username = message.from_user.username or "NoName"
 
-    # Load user and check balance
-    async with AsyncSessionLocal() as db:
-        user = await get_or_create_user(db, user_id)
-        if user.balance < 0.1:
-            # Inline "Back" button
-            back_kb = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="⬅️ Back", callback_data="insufbalback")]
-            ])
-            await message.answer("❌ Insufficient balance to perform BIN lookup.",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
-            ]
-        ))
-            return
+    # Register user if not exists
+    user_balance = await get_balance(user_id)
+    if user_balance is None:
+        await register_user(user_id, username)
+        user_balance = 0
 
-        # Deduct £0.10 and commit
-        user.balance -= 0.1
-        await db.commit()
+    if user_balance < 0.1:
+        await message.answer(
+            "❌ Insufficient balance to perform BIN lookup.",
+            reply_markup=binlookupbutton
+        )
+        await state.clear()
+        return
 
-    # Delete prompt and user input messages
+    # Deduct £0.10 from balance
+    new_balance = user_balance - 0.1
+    if new_balance < 0:
+        new_balance = 0
+    await set_balance(user_id, new_balance)
+
+    # Delete prompt message if exists
+    data = await state.get_data()
+    prompt_id = data.get("prompt_id")
     try:
         if prompt_id:
             await message.bot.delete_message(chat_id=message.chat.id, message_id=prompt_id)
@@ -69,13 +86,14 @@ async def bin_lookup(message: Message, state: FSMContext):
             async with session.get(CSV_URL) as resp:
                 if resp.status != 200:
                     await message.answer("⚠️ Couldn't fetch BIN database.", reply_markup=binlookupbutton)
+                    await state.clear()
                     return
                 csv_data = await resp.text()
 
-        # Read CSV outside of except block!
+        # Load CSV
         df = pd.read_csv(StringIO(csv_data))
 
-        # Filter only UK and BINs >= 400000
+        # Filter UK BINs >= 400000
         df = df[
             (df['CountryName'].astype(str).str.lower() == "united kingdom") &
             (df['BIN'].astype(str).str.isdigit()) &
@@ -88,6 +106,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
                 if rows.empty:
                     await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                    await state.clear()
                     return
 
                 r = rows.iloc[0]
@@ -112,10 +131,11 @@ async def bin_lookup(message: Message, state: FSMContext):
 
             else:
                 await message.answer("❌ Please enter a valid 6-digit BIN.", reply_markup=binlookupbutton)
+                await state.clear()
                 return
 
         else:
-            # Search by issuer/brand/type keyword
+            # Search by keyword in issuer/brand/type
             rows = df[
                 df['Issuer'].astype(str).str.lower().str.contains(user_input) |
                 df['Brand'].astype(str).str.lower().str.contains(user_input) |
@@ -124,6 +144,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
             if rows.empty:
                 await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                await state.clear()
                 return
 
             credit_rows = rows[rows['Type'].astype(str).str.lower().str.contains("credit")]
@@ -147,6 +168,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
             if not output_lines:
                 await message.answer("❌ No matching UK BINs found.", reply_markup=binlookupbutton)
+                await state.clear()
                 return
 
             filepath = "/tmp/uk_bin_results.txt"
@@ -170,6 +192,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
     await state.clear()
 
+
 @router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     prompt = await callback.message.answer(
@@ -184,46 +207,6 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BinLookupState.waiting_for_bin)
     await callback.answer()
 
-@router.callback_query(F.data == "go_back_from_bin")
-async def go_back_from_bin(callback: CallbackQuery, state: FSMContext):
-    try:
-        await callback.message.delete()  # Deletes the "Enter a BIN" message
-    except Exception as e:
-        print(f"⚠️ Failed to delete prompt: {e}")
-
-    await state.clear()
-    await callback.answer("Cancelled.")
-
-
-@router.callback_query(F.data == "BINlookup_again")
-async def binlookup_again(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    result_msg_id = data.get("result_msg_id")
-
-    # Delete previous result
-    if result_msg_id:
-        try:
-            await callback.bot.delete_message(callback.message.chat.id, result_msg_id)
-        except Exception as e:
-            print(f"⚠️ Failed to delete previous result message: {e}")
-
-    # Delete the "Search Another BIN" button message
-    try:
-        await callback.message.delete()
-    except Exception:
-        pass
-    # Send new prompt
-    prompt = await callback.message.answer(
-        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
-            ]
-        )
-    )
-    await state.update_data(prompt_id=prompt.message_id)
-    await state.set_state(BinLookupState.waiting_for_bin)
-    await callback.answer()
 
 @router.callback_query(F.data == "ovo_charger")
 async def ovo_charger(cb: CallbackQuery):
