@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, FSInputFile, InputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, InputFile, BufferedInputFile
 from config import ADMIN_IDS
 from io import BytesIO
 from keyboards import main_menu, back_menu
@@ -70,12 +70,17 @@ async def add_balance_cmd(msg: Message):
 
 @router.message(F.text == "/viewusers")
 async def view_users(msg: Message):
-    users = await get_all_users()  # your function returning list of user dicts
-    text = "\n".join(f"{u['id']} @{u['username']} £{u['balance']}" for u in users)
+    if msg.from_user.id not in ADMINS:
+        return await msg.reply("🚫 You’re not authorized to use this command.")
 
-    # Convert to bytes (UTF-8) and wrap in BytesIO
-    bio = io.BytesIO(text.encode('utf-8'))
-    bio.name = "users.txt"  # set filename attribute so Telegram knows the filename
+    users = await get_all_users()
+    lines = [
+        f"{u['id']} | @{u['username'] or '—'} | £{u['balance']}"
+        for u in users
+    ]
+    text = "\n".join(lines) or "No users yet."
 
-    # Send as document
-    await msg.answer_document(InputFile(bio))
+    buffer = io.BytesIO(text.encode("utf-8"))
+    file = BufferedInputFile(buffer.getvalue(), filename="users.txt")
+
+    await msg.answer_document(file, caption="📄 All registered users")
