@@ -17,7 +17,7 @@ async def cmd_start(msg: Message):
     text = (
         f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
         f"💰 Your balance: £{balance}\n\n"
-        "Type /help to begin."
+        "Use the menu below to continue."
     )
     await msg.answer(text, parse_mode="Markdown", reply_markup=main_menu())
 
@@ -36,10 +36,9 @@ async def back_main(cb: CallbackQuery):
     username = cb.from_user.username or "NoUsername"
     
     text = (
-        f"CipherBot 🛠️\n\n"
-        f"Telegram: @{username}\n"
-        f"Balance: £{balance}\n\n"
-        f"Welcome back! Use the menu below to continue."
+        f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
+        f"💰 Your balance: £{balance}\n\n"
+        "Use the menu below to continue."
     )
     
     await cb.message.edit_text(text, reply_markup=main_menu())
