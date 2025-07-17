@@ -26,7 +26,7 @@ async def cmd_start(msg: Message):
 # BIN Lookup Handlers
 # =========================
 
-@dp.message(BinLookupState.waiting_for_bin)
+@router.message(BinLookupState.waiting_for_bin)
 async def bin_lookup(message: Message, state: FSMContext):
     user_id = message.from_user.id
 
@@ -167,7 +167,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
     await state.clear()
 
-@dp.callback_query(F.data == "BINlookup")
+@router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     prompt = await callback.message.answer(
         "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):",
@@ -181,7 +181,7 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BinLookupState.waiting_for_bin)
     await callback.answer()
 
-@dp.callback_query(F.data == "go_back_from_bin")
+@router.callback_query(F.data == "go_back_from_bin")
 async def go_back_from_bin(callback: CallbackQuery, state: FSMContext):
     try:
         await callback.message.delete()  # Deletes the "Enter a BIN" message
@@ -192,7 +192,7 @@ async def go_back_from_bin(callback: CallbackQuery, state: FSMContext):
     await callback.answer("Cancelled.")
 
 
-@dp.callback_query(F.data == "BINlookup_again")
+@router.callback_query(F.data == "BINlookup_again")
 async def binlookup_again(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     result_msg_id = data.get("result_msg_id")
