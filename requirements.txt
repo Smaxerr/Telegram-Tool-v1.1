@@ -1,4 +1,4 @@
 aiogram==3.21.0
 asyncpg==0.29.0
 pandas
-playwright
+playwright==1.43.0
