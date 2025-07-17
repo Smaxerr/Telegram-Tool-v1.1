@@ -18,7 +18,6 @@ async def main():
     # Register visible bot commands
     await bot.set_my_commands([
         BotCommand(command="start", description="Start the bot"),
-        BotCommand(command="help", description="Show help info"),
         # Add other commands here if needed
     ])
 
