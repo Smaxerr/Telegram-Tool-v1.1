@@ -7,6 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
+from ovo import screenshot_ovo
 
 import io
 
@@ -195,8 +196,15 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "ovo_charger")
-async def ovo_charger(cb: CallbackQuery):
-    await cb.message.edit_text("⚡ OvO Charger coming soon...", reply_markup=back_menu())
+async def handle_ovo_charger(callback: CallbackQuery):
+    msg = await callback.message.answer("⚡ Charging OvO... Please wait.")
+    try:
+        path = await screenshot_ovo()
+        await msg.delete()
+        await callback.message.answer_photo(FSInputFile(path), caption="🔋 OvO Charger ready!")
+    except Exception as e:
+        await msg.edit_text(f"❌ Error charging OvO:\n`{e}`", parse_mode="Markdown")
+
 
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
