@@ -1,0 +1,12 @@
+from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+def main_menu():
+    kb = InlineKeyboardBuilder()
+    kb.button(text="Advanced BIN Lookup", callback_data="bin_lookup")
+    kb.button(text="OvO Charger", callback_data="ovo_charger")
+    return kb.as_markup()
+
+def back_menu():
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🔙 Back to Main Menu", callback_data="back_main")
+    return kb.as_markup()
