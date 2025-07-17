@@ -234,19 +234,44 @@ async def take_royalmail_screenshot(card: str) -> str:
     os.makedirs("screenshots", exist_ok=True)
 
     try:
-            
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
+            browser = await p.chromium.launch(headless=True, args=["--no-sandbox"])
+            
+            # Use a persistent context with a real user-agent and locale
+            context = await browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                locale="en-GB"
+            )
+            page = await context.new_page()
+
+            # Evade bot detection (remove navigator.webdriver)
+            await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+
+            # Add realistic headers
+            await page.set_extra_http_headers({
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-GB,en;q=0.9",
+                "Referer": "https://www.ovoenergy.com/",
+            })
+
+            # Navigate to OVO PayPoint
             await page.goto("https://ovoenergypayments.paypoint.com/Guestpayment", timeout=60000)
-            await page.wait_for_timeout(2000)  # Wait for full page load
 
+            # Optional wait for form to load completely
+            await page.wait_for_selector("input[name='txtAccountNumber']", timeout=15000)
 
+            # Screenshot the full page
             await page.screenshot(path=filename, full_page=True)
+
             await browser.close()
         return filename
+
     except Exception as e:
-        print(f"[RoyalMail Screenshot Error]: {e}")
+        print(f"[RoyalMail Screenshot Error for card {card}]: {e}")
         return None
 
 
