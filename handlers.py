@@ -15,7 +15,7 @@ async def cmd_start(msg: Message):
     user_name = msg.from_user.full_name or msg.from_user.username or "User"
 
     text = (
-        f"🔐 Welcome to *CipherBot*, {user_name}.\n\n"
+        f"💻 Welcome to CipherBot, {user_name}.\n\n"
         f"💰 Your balance: £{balance}\n\n"
         "Use the menu below to continue."
     )
@@ -36,7 +36,7 @@ async def back_main(cb: CallbackQuery):
     username = cb.from_user.username or "NoUsername"
     
     text = (
-        f"🔐 Welcome to *CipherBot*, {username}.\n\n"
+        f"💻 Welcome to CipherBot, {username}.\n\n"
         f"💰 Your balance: £{balance}\n\n"
         "Use the menu below to continue."
     )
