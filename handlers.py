@@ -20,7 +20,7 @@ async def cmd_start(msg: Message):
 
     text = (
         f"💻 Welcome to CipherBot, {user_name}.\n\n"
-        f"💰 Your have {balance} credits remaining.\n\n"
+        f"💰 You have **{balance}** credits remaining.\n\n"
         "Use the menu below to continue."
     )
     await msg.answer(text, parse_mode="Markdown", reply_markup=main_menu())
@@ -219,7 +219,7 @@ async def back_main(cb: CallbackQuery):
     
     text = (
         f"💻 Welcome to CipherBot, {username}.\n\n"
-        f"💰 Your have {balance} credits remaining.\n\n"
+        f"💰 You have **{balance}** credits remaining.\n\n"
         "Use the menu below to continue."
     )
     
