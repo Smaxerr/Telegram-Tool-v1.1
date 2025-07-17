@@ -34,7 +34,18 @@ async def ovo_charger(cb: CallbackQuery):
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
     balance = await get_balance(cb.from_user.id)
-    await cb.message.edit_text(f"💰 Your balance: £{balance}", reply_markup=main_menu())
+    username = cb.from_user.username or "NoUsername"
+    
+    text = (
+        f"CipherBot 🛠️\n\n"
+        f"Telegram: @{username}\n"
+        f"Balance: £{balance}\n\n"
+        f"Welcome back! Use the menu below to continue."
+    )
+    
+    await cb.message.edit_text(text, reply_markup=main_menu())
+    await cb.answer()  # optionally answer the callback to remove loading spinner
+
 
 @router.message(F.text.startswith("/setbalance"))
 async def set_balance_cmd(msg: Message):
