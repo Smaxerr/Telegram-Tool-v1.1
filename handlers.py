@@ -120,7 +120,6 @@ async def bin_lookup(message: Message, state: FSMContext):
                     f"💻 Type: {r.get('Type', 'N/A')}\n"
                     f"📂 Category: {r.get('Category', 'N/A')}"
                 )
-                await state.update_data(result_msg_id=msg.message_id)
 
             else:
                 await message.answer("❌ Please enter a valid 6-digit BIN.")
