@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN
 from handlers import router
-from database import init_db
+from database import init_db_pool
 
 async def main():
     await init_db_pool()
