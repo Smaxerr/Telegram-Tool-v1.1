@@ -261,8 +261,7 @@ async def take_royalmail_screenshot(card: str) -> str:
             # Navigate to OVO PayPoint
             await page.goto("https://ovoenergypayments.paypoint.com/Guestpayment", timeout=60000)
 
-            # Optional wait for form to load completely
-            await page.wait_for_selector("input[name='txtAccountNumber']", timeout=15000)
+            
 
             # Screenshot the full page
             await page.screenshot(path=filename, full_page=True)
