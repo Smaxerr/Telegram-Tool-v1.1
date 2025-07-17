@@ -48,7 +48,7 @@ async def back_main(cb: CallbackQuery):
 @router.message(F.text.startswith("/setbalance"))
 async def set_balance_cmd(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return
+        return await msg.reply("🚫 You’re not authorized to use this command.")
     try:
         _, uid, amount = msg.text.split()
         await set_balance(int(uid), int(amount))
@@ -59,7 +59,7 @@ async def set_balance_cmd(msg: Message):
 @router.message(F.text.startswith("/addbalance"))
 async def add_balance_cmd(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return
+        return await msg.reply("🚫 You’re not authorized to use this command.")
     try:
         _, uid, amount = msg.text.split()
         await add_balance(int(uid), int(amount))
