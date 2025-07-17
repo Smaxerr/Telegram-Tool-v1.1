@@ -70,7 +70,7 @@ async def add_balance_cmd(msg: Message):
 
 @router.message(F.text == "/viewusers")
 async def view_users(msg: Message):
-    if msg.from_user.id not in ADMINS:
+    if msg.from_user.id not in ADMIN_IDS:
         return await msg.reply("🚫 You’re not authorized to use this command.")
 
     users = await get_all_users()
