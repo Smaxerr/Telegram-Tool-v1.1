@@ -235,35 +235,23 @@ async def take_royalmail_screenshot(card: str) -> str:
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True, args=["--no-sandbox"])
-            
-            # Use a persistent context with a real user-agent and locale
-            context = await browser.new_context(
-                user_agent=(
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/120.0.0.0 Safari/537.36"
-                ),
-                locale="en-GB"
+            # Persistent context mimics real user profile
+            user_data_dir = "/tmp/playwright-profile"
+            browser = await p.chromium.launch_persistent_context(
+                user_data_dir=user_data_dir,
+                headless=False,  # use True for prod; False for debug
+                args=["--no-sandbox"]
             )
-            page = await context.new_page()
+            page = await browser.new_page()
 
-            # Evade bot detection (remove navigator.webdriver)
+            # Evasion script: removes "webdriver" from navigator
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
-            # Add realistic headers
-            await page.set_extra_http_headers({
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "en-GB,en;q=0.9",
-                "Referer": "https://www.ovoenergy.com/",
-            })
-
-            # Navigate to OVO PayPoint
             await page.goto("https://ovoenergypayments.paypoint.com/Guestpayment", timeout=60000)
 
-            
 
-            # Screenshot the full page
+
+            # Optional: take screenshot
             await page.screenshot(path=filename, full_page=True)
 
             await browser.close()
@@ -272,7 +260,6 @@ async def take_royalmail_screenshot(card: str) -> str:
     except Exception as e:
         print(f"[RoyalMail Screenshot Error for card {card}]: {e}")
         return None
-
 
 
 
