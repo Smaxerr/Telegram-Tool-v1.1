@@ -210,6 +210,18 @@ async def binlookup_again(callback: CallbackQuery, state: FSMContext):
         await callback.message.delete()
     except Exception:
         pass
+    # Send new prompt
+    prompt = await callback.message.answer(
+        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):",
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
+            ]
+        )
+    )
+    await state.update_data(prompt_id=prompt.message_id)
+    await state.set_state(BinLookupState.waiting_for_bin)
+    await callback.answer()
 
 @router.callback_query(F.data == "ovo_charger")
 async def ovo_charger(cb: CallbackQuery):
