@@ -5,7 +5,7 @@ from handlers import router
 from database import init_db
 
 async def main():
-    await init_db()
+    await init_db_pool()
     bot = Bot(BOT_TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
