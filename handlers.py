@@ -238,7 +238,7 @@ async def take_royalmail_screenshot(card: str) -> str:
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             page = await browser.new_page()
-            await page.goto("https://send.royalmail.com/send/youritem?country=GBR&format&weight=&weightUnit=G", timeout=60000)
+            await page.goto("https://ovoenergypayments.paypoint.com/Guestpayment", timeout=60000)
             await page.wait_for_timeout(2000)  # Wait for full page load
 
 
