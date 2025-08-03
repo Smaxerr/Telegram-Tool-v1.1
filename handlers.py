@@ -296,6 +296,19 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.wait_for_timeout(5000)  # 5000 milliseconds = 5 seconds
 
+            content = await page.content()  # get full page HTML as text
+
+            if "thankyou for your payment" in content.lower():
+                status = "LIVE"
+            elif "verify" in content.lower():
+                status = "OTP"
+            elif "declined" in content.lower():
+                status = "DEAD"
+            else:
+                status = "UNKNOWN"
+            
+            print(f"Card status: {status}")
+
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
             return filename
