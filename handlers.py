@@ -230,7 +230,6 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     await message.answer("✅ All done.")
     await state.clear()
-
 # ===== Take screenshot using Playwright =====
 async def take_royalmail_screenshot(card: str) -> str:
     filename = f"screenshots/{uuid.uuid4()}.png"
@@ -265,24 +264,22 @@ async def take_royalmail_screenshot(card: str) -> str:
             city = faker.city()
             postcode = faker.postcode()
 
-            # Fill form
+            # Fill basic form
             await page.fill('#customerid', '9826218241002580832')
             await page.fill('#amount', '1')
             await page.fill('#cardholdername', name)
 
-            # ===== Handle iframe =====
+            # ===== IFRAME: Only card number =====
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=10000)
             frame = await frame_element.content_frame()
-
             await frame.fill('input[name="card_number"]', card_number)
-            
-            await frame.select_option('select[name="PaymentCard.ExpiryMonth"]', exp_month)
-            await frame.select_option('select[name="PaymentCard.ExpiryYear"]', exp_year)
 
-            await frame.fill('input[name="PaymentCard.CVV"]', cvv)
+            # ===== Main page: expiry + cvv =====
+            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', exp_month)
+            await page.select_option('select[name="PaymentCard.ExpiryYear"]', exp_year)
+            await page.fill('input[name="PaymentCard.CVV"]', cvv)
 
-
-            # ===== Back to main page =====
+            # ===== Continue filling form =====
             await page.fill('#postcode', postcode)
             await page.fill('#address1', address1)
             await page.fill('#city', city)
@@ -290,9 +287,7 @@ async def take_royalmail_screenshot(card: str) -> str:
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
-            # Optional: Screenshot
             await page.screenshot(path=filename, full_page=True)
-
             await browser.close()
             return filename
 
