@@ -237,11 +237,11 @@ async def take_royalmail_screenshot(card: str) -> str:
     os.makedirs("screenshots", exist_ok=True)
 
     card_parts = card.strip().split("|")
-if len(card_parts) != 4:
-    print(f"[Invalid card format]: {card}")
-    return None
-
-card_number, exp_month, exp_year, cvv = card_parts
+    if len(card_parts) != 4:
+        print(f"[Invalid card format]: {card}")
+        return None
+    
+    card_number, exp_month, exp_year, cvv = card_parts
 
 
     try:
