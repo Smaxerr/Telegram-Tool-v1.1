@@ -291,15 +291,21 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             await page.wait_for_timeout(5000)
 
             content = await page.content()
-
-            if "thankyou for your payment" in content.lower():
+            content_lower = content.lower()  # Convert once for efficiency
+            
+            if "thankyou for your payment" in content_lower:
                 status = "LIVE"
-            elif "verify" in content.lower() or "Authorise" in content.lower() or "confirm" in content.lower() or "app" in content.lower() or "otp" in content.lower():
+            elif ("verify" in content_lower or 
+                  "authorise" in content_lower or 
+                  "confirm" in content_lower or 
+                  "app" in content_lower or 
+                  "otp" in content_lower):
                 status = "OTP"
-            elif "declined" in content.lower():
+            elif "declined" in content_lower:
                 status = "DEAD"
             else:
                 status = "UNKNOWN"
+
 
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
