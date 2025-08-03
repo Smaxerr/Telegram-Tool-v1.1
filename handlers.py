@@ -285,6 +285,8 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
 
+            await page.check('input[name="AcceptedTermsAndConditions"]')
+
 
 
             # Optional: take screenshot
