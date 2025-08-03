@@ -255,7 +255,7 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('#cardholdername', 'Mr John Smith')
 
-            frame_element = await page.wait_for_selector('#50c9ceea-6ba9-484e-a6f5-52740d07bc6a_iframe')
+            frame_element = await page.wait_for_selector('#\\35 0c9ceea-6ba9-484e-a6f5-52740d07bc6a_iframe')
             frame = await frame_element.content_frame()
             await frame.fill('input', '4111111111111111')
 
