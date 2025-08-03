@@ -259,11 +259,11 @@ async def take_royalmail_screenshot(card: str) -> str:
             frame = await frame_element.content_frame()
             await frame.fill('input[name="card_number"]', '4111111111111111')
             
-            await frame.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
+            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
 
-            await frame.select_option('select[name="PaymentCard.ExpiryYear"]', '2029')
+            await page.select_option('select[name="PaymentCard.ExpiryYear"]', '2029')
 
-            await frame.fill('input[name="PaymentCard.CVV"]', '000')
+            await page.fill('input[name="PaymentCard.CVV"]', '000')
 
             await page.fill('#postcode', 'SO168GX')
 
