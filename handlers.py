@@ -255,13 +255,16 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('#cardholdername', 'Mr John Smith')
 
-            await page.fill('#card_number', '4111111111111111')
+            frame_element = await page.wait_for_selector('#50c9ceea-6ba9-484e-a6f5-52740d07bc6a_iframe')
+            frame = await frame_element.content_frame()
+            await frame.fill('input', '4111111111111111')
 
-            await page.select_option('#expiryMonth', '01')
 
-            await page.select_option('#expiryYear', '2029')
+            #await page.select_option('#expiryMonth', '01')
 
-            await page.fill('#securitycode', '000')
+            #await page.select_option('#expiryYear', '2029')
+
+            #await page.fill('#securitycode', '000')
 
             await page.fill('#postcode', 'SO168GX')
 
