@@ -275,11 +275,11 @@ async def take_royalmail_screenshot(card: str) -> str:
             frame = await frame_element.content_frame()
 
             await frame.fill('input[name="card_number"]', card_number)
-            await frame.fill('input[name="cvv"]', '000')
+            await page.fill('input[name="cvv"]', cvv)
 
             # ===== Handle expiry dropdowns (also inside iframe!) =====
-            await frame.select_option('select[name="expiry_month"]', '01')
-            await frame.select_option('select[name="expiry_year"]', '30')
+            await page.select_option('select[name="expiry_month"]', exp_month)
+            await page.select_option('select[name="expiry_year"]', exp_year)
 
             # ===== Back to main page =====
             await page.fill('#postcode', postcode)
