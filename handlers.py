@@ -232,59 +232,46 @@ async def handle_card_list(message: Message, state: FSMContext):
     await state.clear()
 
 
-async def take_royalmail_screenshot(card: str) -> str:
+async def take_royalmail_screenshot(card: str) -> tuple[str, str]:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
 
     try:
-        # Parse card input
         card_parts = card.strip().split("|")
         if len(card_parts) != 4:
-            print(f"[Invalid card format]: {card}")
-            return None
+            return None, "❌ Invalid card format"
 
         card_number, exp_month, exp_year, cvv = card_parts
-
-        # Convert 2-digit year to 4-digit year if needed
         if len(exp_year) == 2:
             exp_year = "20" + exp_year
 
         async with async_playwright() as p:
-            user_data_dir = "/tmp/playwright-profile"
             browser = await p.chromium.launch_persistent_context(
-                user_data_dir=user_data_dir,
+                user_data_dir="/tmp/playwright-profile",
                 headless=True,
                 args=["--no-sandbox"]
             )
             page = await browser.new_page()
-
-            # Anti-bot evasion
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-
             await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
 
-            # Fake info
             name = faker.name()
             address1 = faker.street_address()
             city = faker.city()
             postcode = faker.postcode()
 
-            # Fill basic form
             await page.fill('#customerid', '9826218241002580832')
             await page.fill('#amount', '1')
             await page.fill('#cardholdername', name)
 
-            # ===== IFRAME: Only card number =====
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=10000)
             frame = await frame_element.content_frame()
             await frame.fill('input[name="card_number"]', card_number)
 
-            # ===== Main page: expiry + cvv =====
             await page.select_option('select[name="PaymentCard.ExpiryMonth"]', exp_month)
             await page.select_option('select[name="PaymentCard.ExpiryYear"]', exp_year)
             await page.fill('input[name="PaymentCard.CVV"]', cvv)
 
-            # ===== Continue filling form =====
             await page.fill('#postcode', postcode)
             await page.fill('#address1', address1)
             await page.fill('#city', city)
@@ -293,29 +280,26 @@ async def take_royalmail_screenshot(card: str) -> str:
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
             await page.click('input#makePayment')
+            await page.wait_for_timeout(5000)
 
-            await page.wait_for_timeout(5000)  # 5000 milliseconds = 5 seconds
-
-            content = await page.content()  # get full page HTML as text
-
+            content = await page.content()
             if "thankyou for your payment" in content.lower():
-                status = "LIVE"
-            elif "verify" in content.lower():
-                status = "OTP"
+                status = "✅ LIVE"
+            elif "verify" in content.lower() or "authorise" in content.lower():
+                status = "🔒 OTP"
             elif "declined" in content.lower():
-                status = "DEAD"
+                status = "❌ DEAD"
             else:
-                status = "UNKNOWN"
-            
-            print(f"Card status: {status}")
+                status = "⚠️ UNKNOWN"
 
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
-            return filename
+            return filename, status
 
     except Exception as e:
         print(f"[Screenshot Error for card {card}]: {e}")
-        return None
+        return None, "❌ ERROR"
+
 
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
