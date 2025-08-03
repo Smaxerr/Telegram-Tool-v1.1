@@ -255,21 +255,15 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('#cardholdername', 'Mr John Smith')
 
-            # Wait for the iframe using part of its src URL (reliable)
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=60000)
-            
-            # Switch context to the iframe
             frame = await frame_element.content_frame()
-            
-            # Wait and fill the card number inside the iframe
             await frame.fill('input[name="card_number"]', '4111111111111111')
+            
+            await frame.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
 
+            await frame.select_option('select[name="PaymentCard.ExpiryYear"]', '2029')
 
-            #await page.select_option('#expiryMonth', '01')
-
-            #await page.select_option('#expiryYear', '2029')
-
-            #await page.fill('#securitycode', '000')
+            await frame.fill('input[name="PaymentCard.CVV"]', '000')
 
             await page.fill('#postcode', 'SO168GX')
 
