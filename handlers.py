@@ -300,17 +300,17 @@ async def take_royalmail_screenshot(card: str) -> tuple:
                     frame_content = await frame.content()
                     lower = frame_content.lower()
 
-            if "thankyou" in lower:
-                status = "LIVE"
-                break
-            elif any(word in lower for word in ["verify", "authorise", "otp", "confirm", "mobile app"]):
-                status = "OTP"
-                break
-            elif "declined" in lower:
-                status = "DEAD" 
-                break
-    except Exception:
-        continue
+                    if "thankyou" in lower:
+                        status = "LIVE"
+                        break
+                    elif any(word in lower for word in ["verify", "authorise", "otp", "confirm", "mobile app"]):
+                        status = "OTP"
+                        break
+                    elif "declined" in lower:
+                        status = "DEAD" 
+                        break
+                except Exception:
+                    continue
         
 
             await page.screenshot(path=filename, full_page=True)
