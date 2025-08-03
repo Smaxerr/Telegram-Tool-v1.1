@@ -291,7 +291,7 @@ async def take_royalmail_screenshot(card: str) -> tuple:
 
 
             
-            await page.wait_for_timeout(8000)
+            await page.wait_for_timeout(12000)
 
             status = "UNKNOWN"
 
@@ -300,7 +300,7 @@ async def take_royalmail_screenshot(card: str) -> tuple:
                     frame_content = await frame.content()
                     lower = frame_content.lower()
 
-                    if "thankyou" in lower:
+                    if "payment authorised" in lower:
                         status = "LIVE"
                         break
                     elif any(word in lower for word in ["verify", "authorise", "otp", "confirm", "mobile app"]):
