@@ -249,7 +249,29 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
 
-            
+            await page.fill('#customerid', '9826218241002580832')
+
+            await page.fill('#amount', '1')
+
+            await page.fill('#cardholdername', 'Mr John Smith')
+
+            await page.fill('#card_number', '4111111111111111')
+
+            await page.select_option('#expiryMonth', '01')
+
+            await page.select_option('#expiryYear', '2029')
+
+            await page.fill('#securitycode', '000')
+
+            await page.fill('#postcode', 'SO168GX')
+
+            await page.fill('#address1', '1 Street Lane')
+
+            await page.fill('#city', 'Southampton')
+
+            await page.fill('#emailForConfirmation', 'maxxxier@yahoo.com')
+
+            await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
 
 
 
