@@ -236,71 +236,64 @@ async def take_royalmail_screenshot(card: str) -> str:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
 
-    card_parts = card.strip().split("|")
-    if len(card_parts) != 4:
-        print(f"[Invalid card format]: {card}")
-        return None
-    
-    card_number, exp_month, exp_year, cvv = card_parts
-
-
     try:
+        # Parse card input
+        card_parts = card.strip().split("|")
+        if len(card_parts) != 4:
+            print(f"[Invalid card format]: {card}")
+            return None
+
+        card_number, exp_month, exp_year, cvv = card_parts
+
         async with async_playwright() as p:
-            # Persistent context mimics real user profile
             user_data_dir = "/tmp/playwright-profile"
             browser = await p.chromium.launch_persistent_context(
                 user_data_dir=user_data_dir,
-                headless=True,  # use True for prod; False for debug
+                headless=True,
                 args=["--no-sandbox"]
             )
             page = await browser.new_page()
 
-            name = faker.name()
-            address1 = faker.street_address()
-            city = faker.city()
-            postcode = faker.postcode()
-            phone = faker.phone_number()
-
-
+            # Anti-bot evasion
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
             await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
 
+            # Fake info
+            name = faker.name()
+            address1 = faker.street_address()
+            city = faker.city()
+            postcode = faker.postcode()
+
+            # Fill form
             await page.fill('#customerid', '9826218241002580832')
-
             await page.fill('#amount', '1')
-
             await page.fill('#cardholdername', name)
 
-            frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=60000)
+            # ===== Handle iframe =====
+            frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=10000)
             frame = await frame_element.content_frame()
+
             await frame.fill('input[name="card_number"]', card_number)
-            
-            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
+            await frame.fill('input[name="cvv"]', cvv)
 
-            await page.select_option('select[name="PaymentCard.ExpiryYear"]', '30')
+            # ===== Handle expiry dropdowns (also inside iframe!) =====
+            await frame.select_option('select[name="expiry_month"]', exp_month)
+            await frame.select_option('select[name="expiry_year"]', exp_year)
 
-            await page.fill('input[name="PaymentCard.CVV"]', '000')
-
+            # ===== Back to main page =====
             await page.fill('#postcode', postcode)
-
             await page.fill('#address1', address1)
-
             await page.fill('#city', city)
-
             await page.fill('#emailForConfirmation', 'maxxxier@yahoo.com')
-
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
-
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
-
-
-            # Optional: take screenshot
+            # Optional: Screenshot
             await page.screenshot(path=filename, full_page=True)
 
             await browser.close()
-        return filename
+            return filename
 
     except Exception as e:
         print(f"[Screenshot Error for card {card}]: {e}")
