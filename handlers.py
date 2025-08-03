@@ -247,7 +247,9 @@ async def take_royalmail_screenshot(card: str) -> str:
             # Evasion script: removes "webdriver" from navigator
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
-            await page.goto("https://ovoenergypayments.paypoint.com", timeout=60000)
+            await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
+
+            
 
 
 
@@ -258,7 +260,7 @@ async def take_royalmail_screenshot(card: str) -> str:
         return filename
 
     except Exception as e:
-        print(f"[RoyalMail Screenshot Error for card {card}]: {e}")
+        print(f"[Screenshot Error for card {card}]: {e}")
         return None
 
 
