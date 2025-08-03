@@ -230,7 +230,8 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     await message.answer("✅ All done.")
     await state.clear()
-# ===== Take screenshot using Playwright =====
+
+
 async def take_royalmail_screenshot(card: str) -> str:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
@@ -243,6 +244,10 @@ async def take_royalmail_screenshot(card: str) -> str:
             return None
 
         card_number, exp_month, exp_year, cvv = card_parts
+
+        # Convert 2-digit year to 4-digit year if needed
+        if len(exp_year) == 2:
+            exp_year = "20" + exp_year
 
         async with async_playwright() as p:
             user_data_dir = "/tmp/playwright-profile"
@@ -294,9 +299,6 @@ async def take_royalmail_screenshot(card: str) -> str:
     except Exception as e:
         print(f"[Screenshot Error for card {card}]: {e}")
         return None
-
-
-
 
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
