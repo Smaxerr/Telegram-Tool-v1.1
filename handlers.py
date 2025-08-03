@@ -220,13 +220,16 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     for idx, card in enumerate(cards, start=1):
         await message.answer(f"📦 Processing card {idx}: `{card}`", parse_mode="Markdown")
-        screenshot_path = await take_royalmail_screenshot(card)
+        screenshot_path, status = await take_royalmail_screenshot(card)  # unpack tuple here
 
         if screenshot_path:
             await message.answer_photo(FSInputFile(screenshot_path))
             os.remove(screenshot_path)
         else:
             await message.answer(f"❌ Failed to process card `{card}`")
+
+    await message.answer("✅ All done.")
+    await state.clear()
 
     await message.answer("✅ All done.")
     await state.clear()
