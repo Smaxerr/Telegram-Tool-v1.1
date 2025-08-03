@@ -307,6 +307,8 @@ async def take_royalmail_screenshot(card: str) -> tuple:
                 status = "UNKNOWN"
 
 
+            print(content_lower[:500])  # or use logging
+
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
             return filename, status
