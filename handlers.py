@@ -288,7 +288,7 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
             await page.click('input#makePayment')
-            await page.wait_for_timeout(5000)
+            await page.wait_for_timeout(8000)
 
             content = await page.content()
             content_lower = content.lower()  # Convert once for efficiency
