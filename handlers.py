@@ -9,6 +9,9 @@ from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
+from faker import Faker
+
+faker = Faker("en_GB")
 
 import uuid
 import os
@@ -244,6 +247,13 @@ async def take_royalmail_screenshot(card: str) -> str:
             )
             page = await browser.new_page()
 
+            name = faker.name()
+            address1 = faker.street_address()
+            city = faker.city()
+            postcode = faker.postcode()
+            phone = faker.phone_number()
+
+
             # Evasion script: removes "webdriver" from navigator
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
@@ -253,7 +263,7 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('#amount', '1')
 
-            await page.fill('#cardholdername', 'Mr John Smith')
+            await page.fill('#cardholdername', name)
 
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=60000)
             frame = await frame_element.content_frame()
@@ -265,11 +275,11 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             await page.fill('input[name="PaymentCard.CVV"]', '000')
 
-            await page.fill('#postcode', 'SO168GX')
+            await page.fill('#postcode', postcode)
 
-            await page.fill('#address1', '1 Street Lane')
+            await page.fill('#address1', address1)
 
-            await page.fill('#city', 'Southampton')
+            await page.fill('#city', city)
 
             await page.fill('#emailForConfirmation', 'maxxxier@yahoo.com')
 
