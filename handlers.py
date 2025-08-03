@@ -292,6 +292,10 @@ async def take_royalmail_screenshot(card: str) -> str:
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
+            await page.click('input#makePayment')
+
+            await page.wait_for_timeout(5000)  # 5000 milliseconds = 5 seconds
+
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
             return filename
