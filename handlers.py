@@ -218,6 +218,8 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     await message.answer(f"🔍 Received {len(cards)} card(s). Starting...")
 
+    live_cards = []  # to collect live cards
+
     for idx, card in enumerate(cards, start=1):
         await message.answer(f"📦 Processing card {idx}: `{card}`", parse_mode="Markdown")
         screenshot_path, status = await take_royalmail_screenshot(card)
@@ -228,9 +230,17 @@ async def handle_card_list(message: Message, state: FSMContext):
         else:
             await message.answer(f"❌ Failed to process card `{card}`. Status: {status}")
 
-    await message.answer("✅ All done.")
+        if status == "LIVE":
+            live_cards.append(card)
+
+    if live_cards:
+        live_list_text = "\n".join(live_cards)
+        await message.answer(f"✅ All done.\n\n🎉 Live cards:\n{live_list_text}")
+    else:
+        await message.answer("✅ All done.\n\nNo live cards found.")
+
     await state.clear()
-    
+
 async def take_royalmail_screenshot(card: str) -> tuple:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
