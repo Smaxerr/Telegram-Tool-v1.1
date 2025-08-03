@@ -262,7 +262,6 @@ async def take_royalmail_screenshot(card: str) -> str:
             phone = faker.phone_number()
 
 
-            # Evasion script: removes "webdriver" from navigator
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
             await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
@@ -277,9 +276,9 @@ async def take_royalmail_screenshot(card: str) -> str:
             frame = await frame_element.content_frame()
             await frame.fill('input[name="card_number"]', card_number)
             
-            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', exp_month)
+            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
 
-            await page.select_option('select[name="PaymentCard.ExpiryYear"]', exp_year)
+            await page.select_option('select[name="PaymentCard.ExpiryYear"]', '30')
 
             await page.fill('input[name="PaymentCard.CVV"]', cvv)
 
