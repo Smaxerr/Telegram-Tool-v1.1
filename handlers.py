@@ -236,6 +236,14 @@ async def take_royalmail_screenshot(card: str) -> str:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
 
+    card_parts = card.strip().split("|")
+if len(card_parts) != 4:
+    print(f"[Invalid card format]: {card}")
+    return None
+
+card_number, exp_month, exp_year, cvv = card_parts
+
+
     try:
         async with async_playwright() as p:
             # Persistent context mimics real user profile
@@ -267,13 +275,13 @@ async def take_royalmail_screenshot(card: str) -> str:
 
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=60000)
             frame = await frame_element.content_frame()
-            await frame.fill('input[name="card_number"]', card)
+            await frame.fill('input[name="card_number"]', card_number)
             
-            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', '01')
+            await page.select_option('select[name="PaymentCard.ExpiryMonth"]', exp_month)
 
-            await page.select_option('select[name="PaymentCard.ExpiryYear"]', '2029')
+            await page.select_option('select[name="PaymentCard.ExpiryYear"]', exp_year)
 
-            await page.fill('input[name="PaymentCard.CVV"]', '000')
+            await page.fill('input[name="PaymentCard.CVV"]', cvv)
 
             await page.fill('#postcode', postcode)
 
