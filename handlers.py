@@ -294,7 +294,7 @@ async def take_royalmail_screenshot(card: str) -> tuple:
 
             if "thankyou for your payment" in content.lower():
                 status = "LIVE"
-            elif "verify" in content.lower() or "authorise" in content.lower():
+            elif "verify" in content.lower() or "Authorise" in content.lower() or "confirm" in content.lower() or "app" in content.lower() or "otp" in content.lower():
                 status = "OTP"
             elif "declined" in content.lower():
                 status = "DEAD"
