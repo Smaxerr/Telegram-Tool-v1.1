@@ -288,26 +288,30 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
             await page.click('input#makePayment')
+
+
+            
             await page.wait_for_timeout(8000)
 
-            content = await page.content()
-            content_lower = content.lower()  # Convert once for efficiency
-            
-            if "thankyou for your payment" in content_lower:
+            status = "UNKNOWN"
+
+            for frame in page.frames:
+                try:
+                    frame_content = await frame.content()
+                    lower = frame_content.lower()
+
+            if "thankyou" in lower:
                 status = "LIVE"
-            elif ("verify" in content_lower or 
-                  "authorise" in content_lower or 
-                  "confirm" in content_lower or 
-                  "app" in content_lower or 
-                  "otp" in content_lower):
+                break
+            elif any(word in lower for word in ["verify", "authorise", "otp", "confirm", "mobile app"]):
                 status = "OTP"
-            elif "declined" in content_lower:
-                status = "DEAD"
-            else:
-                status = "UNKNOWN"
-
-
-            print(content_lower[:500])  # or use logging
+                break
+            elif "declined" in lower:
+                status = "DEAD" 
+                break
+    except Exception:
+        continue
+        
 
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
