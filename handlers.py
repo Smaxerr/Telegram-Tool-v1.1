@@ -332,10 +332,7 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
 
             await page.locator('input#makePayment').click(force=True, timeout=10000)
             
-            try:
-                await page.wait_for_load_state("networkidle", timeout=12000)
-            except:
-                pass
+            await page.wait_for_timeout(15000)
 
             
             status = "UNKNOWN"
