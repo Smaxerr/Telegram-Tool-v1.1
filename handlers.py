@@ -210,14 +210,6 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     await state.set_state(BinLookupState.waiting_for_bin)
     await callback.answer()
 
-@router.callback_query(F.data == "ccformatter")
-async def start_ccformatter(callback: CallbackQuery, state: FSMContext):
-    prompt = await callback.message.answer(
-        "🔍 Please enter your list of cards you'd like to format."
-    )
-    await state.update_data(prompt_id=prompt.message_id)
-    await state.set_state(BinLookupState.ccformatter)
-    await callback.answer()
 
 
 
