@@ -330,9 +330,14 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
-            await page.click('input#makePayment')
-            await page.wait_for_timeout(12000)
+            await page.locator('input#makePayment').click(force=True, timeout=10000)
+            
+            try:
+                await page.wait_for_load_state("networkidle", timeout=12000)
+            except:
+                pass
 
+            
             status = "UNKNOWN"
             for frame in page.frames:
                 try:
