@@ -9,6 +9,7 @@ from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
+from db import set_ovo_id 
 from faker import Faker
 
 faker = Faker("en_GB")
@@ -18,6 +19,9 @@ import os
 import io
 
 router = Router()
+
+class OVOStates(StatesGroup):
+    waiting_for_ovo_id = State()
 
 @router.message(F.text == "/start")
 async def cmd_start(msg: Message):
@@ -352,6 +356,24 @@ async def take_royalmail_screenshot(card: str) -> tuple:
     except Exception as e:
         print(f"[Screenshot Error for card {card}]: {e}")
         return None, "ERROR"
+
+@router.message(Command("setovo"))
+async def cmd_set_ovo(message: types.Message, state: FSMContext):
+    await message.answer("Please send me your OVO Customer ID (a number).")
+    await state.set_state(OVOStates.waiting_for_ovo_id)
+
+@router.message(OVOStates.waiting_for_ovo_id)
+async def process_ovo_id(message: types.Message, state: FSMContext):
+    ovo_id = message.text.strip()
+
+    # Optionally validate ovo_id here (for example, length check)
+    if not ovo_id.isdigit() or len(ovo_id) < 10:
+        await message.answer("❌ Invalid OVO Customer ID. Please send a valid number.")
+        return
+
+    await set_ovo_customer_id(message.from_user.id, ovo_id)
+    await message.answer(f"✅ Your OVO Customer ID has been saved:\n`{ovo_id}`", parse_mode="Markdown")
+    await state.clear()
 
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
