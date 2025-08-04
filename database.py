@@ -51,14 +51,14 @@ async def get_all_users():
         return await conn.fetch("SELECT id, username, balance FROM users")
 
 async def set_ovo_id(user_id: int, ovo_id: str):
-    await database.execute(
+    await db.execute(
         "UPDATE users SET ovo_id = ? WHERE user_id = ?",
         (ovo_id, user_id),
     )
     await db.commit()
 
 async def get_ovo_id(user_id: int) -> str | None:
-    row = await database.execute_fetchone(
+    row = await db.execute_fetchone(
         "SELECT ovo_id FROM users WHERE user_id = ?",
         (user_id,),
     )
