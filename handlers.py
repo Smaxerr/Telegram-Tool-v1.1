@@ -330,10 +330,22 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
             await page.fill('#mobileNumberForSmsConfirmation', '07454805800')
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
-            await page.locator('input#makePayment').click(force=True, timeout=10000)
             
-            await page.wait_for_timeout(15000)
-
+            # Click the Make Payment button
+            button_locator = page.locator('input#makePayment')
+            # Try clicking once
+            await button_locator.click(force=True, timeout=10000)
+            await page.wait_for_timeout(2000)  # brief pause after click
+            # Check if button still visible — retry if needed
+            for attempt in range(2):  # retry up to 2 times
+                if await button_locator.is_visible():
+                    print(f"[Retry] Button still visible. Retrying click... (Attempt {attempt + 1})")
+                    await button_locator.click(force=True)
+                    await page.wait_for_timeout(2000)
+                else:
+                    break
+            else:
+                print("[Warning] Button still visible after 2 retries.")
             
             status = "UNKNOWN"
             for frame in page.frames:
