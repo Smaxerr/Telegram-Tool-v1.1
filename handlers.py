@@ -349,7 +349,7 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
             else:
                 print("[Warning] Button still visible after 2 retries.")
 
-            await page.wait_for_timeout(7500)  # brief pause after click
+            await page.wait_for_timeout(12000)  # brief pause after click
             
             status = "UNKNOWN"
             for frame in page.frames:
