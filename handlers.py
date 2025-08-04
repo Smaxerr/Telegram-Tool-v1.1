@@ -11,8 +11,10 @@ from database import register_user, get_balance, set_balance, add_balance, get_a
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
+from database import get_ovo_id
 from aiogram.filters import Command
 from aiogram import types
+
 
 from faker import Faker
 
@@ -239,6 +241,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     await message.answer(
         f"🔍 Received {len(cards)} card(s). Starting...\n"
+        f"⏳ Using your saved OVO ID: {ovo_id}\n"
         f"💸 Deducting {len(cards)} credit(s) from your balance."
     )
 
@@ -306,8 +309,13 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             city = faker.city()
             postcode = faker.postcode()
 
+            ovo_id = await get_ovo_id(message.from_user.id)
+            if not ovo_id:
+                await message.reply("❌ You haven't set your OVO ID yet. Use /setovo to set it.")
+                return
+
             # Fill form
-            await page.fill('#customerid', '9826218241002580832')
+            await page.fill('#customerid', ovo_id)
             await page.fill('#amount', '1')
             await page.fill('#cardholdername', name)
 
