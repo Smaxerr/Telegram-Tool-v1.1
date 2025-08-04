@@ -11,6 +11,7 @@ from database import register_user, get_balance, set_balance, add_balance, get_a
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
+from aiogram.filters import Command
 from faker import Faker
 
 faker = Faker("en_GB")
