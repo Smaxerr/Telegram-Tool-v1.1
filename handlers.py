@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
+from aiogram.fsm.state import StatesGroup, State
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
