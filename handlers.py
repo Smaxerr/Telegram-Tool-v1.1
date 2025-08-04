@@ -257,7 +257,7 @@ async def handle_card_list(message: Message, state: FSMContext):
         await set_balance(user_id, user_balance)
 
         await message.answer(f"📦 Processing card {idx}: `{card}`", parse_mode="Markdown")
-        screenshot_path, status = await take_royalmail_screenshot(card)
+        screenshot_path, status = await take_royalmail_screenshot(message.from_user.id, card)
 
         if screenshot_path:
             await message.answer_photo(FSInputFile(screenshot_path), caption=f"Status: {status}")
