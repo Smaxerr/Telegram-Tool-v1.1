@@ -9,7 +9,7 @@ from keyboards import main_menu, back_menu
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
 from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
-from db import set_ovo_id 
+from database import set_ovo_id 
 from faker import Faker
 
 faker = Faker("en_GB")
