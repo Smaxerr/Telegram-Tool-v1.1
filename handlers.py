@@ -231,7 +231,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     # Register user if not exists
     user_balance = await get_balance(user_id)
-    if user_balance is 
+    if user_balance is None:
         await register_user(user_id, username)
         user_balance = 0
 
