@@ -239,6 +239,8 @@ async def handle_card_list(message: Message, state: FSMContext):
         await state.clear()
         return
 
+    ovo_id = await get_ovo_id(message.from_user.id)
+
     await message.answer(
         f"🔍 Received {len(cards)} card(s). Starting...\n"
         f"⏳ Using your saved OVO ID: {ovo_id}\n"
