@@ -18,6 +18,10 @@ async def main():
     # Register visible bot commands
     await bot.set_my_commands([
         BotCommand(command="start", description="Start the bot"),
+        BotCommand(command="setovo", description="Set your OVO ID"),
+        BotCommand(command="setbalance", description="Set a balance"),
+        BotCommand(command="addbalance", description="Add a balance"),
+        BotCommand(command="viewusers", description="View all users"),
         # Add other commands here if needed
     ])
 
