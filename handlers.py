@@ -229,10 +229,10 @@ async def handle_card_list(message: Message, state: FSMContext):
         await state.clear()
         return
 
-await message.answer(
-    f"🔍 Received {len(cards)} card(s). Starting...\n"
-    f"💸 Deducting {len(cards)} credit(s) from your balance."
-)
+    await message.answer(
+        f"🔍 Received {len(cards)} card(s). Starting...\n"
+        f"💸 Deducting {len(cards)} credit(s) from your balance."
+    )
 
     live_cards = []  # to collect live cards
 
