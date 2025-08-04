@@ -50,12 +50,18 @@ async def get_all_users():
     async with pool.acquire() as conn:
         return await conn.fetch("SELECT id, username, balance FROM users")
 
-async def get_ovo_id(user_id: int) -> str | None:
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT ovo_id FROM users WHERE id = $1", user_id)
-        return row['ovo_id'] if row else None
-
 async def set_ovo_id(user_id: int, ovo_id: str):
-    async with pool.acquire() as conn:
-        await conn.execute("UPDATE users SET ovo_id = $1 WHERE id = $2", ovo_id, user_id)
+    await db.execute(
+        "UPDATE users SET ovo_id = ? WHERE user_id = ?",
+        (ovo_id, user_id),
+    )
+    await db.commit()
 
+async def get_ovo_id(user_id: int) -> str | None:
+    row = await db.execute_fetchone(
+        "SELECT ovo_id FROM users WHERE user_id = ?",
+        (user_id,),
+    )
+    if row and row[0]:
+        return row[0]
+    return None
