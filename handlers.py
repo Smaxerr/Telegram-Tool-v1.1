@@ -229,7 +229,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     # Register user if not exists
     user_balance = await get_balance(user_id)
-    if user_balance is None:
+    if user_balance is 
         await register_user(user_id, username)
         user_balance = 0
 
@@ -396,7 +396,7 @@ async def back_main(cb: CallbackQuery):
     username = cb.from_user.username or "NoUsername"
     
     text = (
-        f"💻 Welcome to CipherBot, {username}.\n\n"
+        f"💻 Welcome to CypherBot, {username}.\n\n"
         f"💰 You have **{balance}** credits remaining.\n\n"
         "Use the menu below to continue."
     )
