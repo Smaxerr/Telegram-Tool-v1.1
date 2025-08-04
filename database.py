@@ -20,6 +20,9 @@ async def init_db_pool():
             ADD COLUMN IF NOT EXISTS ovo_id TEXT;
         """)
 
+async def add_ovo_id_column():
+    await db.execute("ALTER TABLE users ADD COLUMN ovo_id TEXT")
+
 async def get_user(user_id):
     async with pool.acquire() as conn:
         user = await conn.fetchrow("SELECT * FROM users WHERE id = $1", user_id)
