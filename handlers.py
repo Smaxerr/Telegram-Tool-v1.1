@@ -216,8 +216,22 @@ async def handle_card_list(message: Message, state: FSMContext):
         await message.answer("❌ No cards found. Please send again.")
         return
 
+    user_balance = await get_balance(user_id)
+    if user_balance is None:
+        await register_user(user_id, message.from_user.username or "NoName")
+        user_balance = 0
+
     await message.answer(f"🔍 Received {len(cards)} card(s). Starting...")
 
+    for idx, card in enumerate(cards, start=1):
+        if user_balance < 1:
+            await message.answer("❌ Insufficient credits to continue processing cards.")
+            break  # Stop processing further cards
+
+        # Deduct 1 credit for this card
+        user_balance -= 1
+        await set_balance(user_id, user_balance)
+    
     live_cards = []  # to collect live cards
 
     for idx, card in enumerate(cards, start=1):
