@@ -207,34 +207,39 @@ async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RoyalMailStates.awaiting_cards)
     await callback.message.answer("Please send the card(s), one per line:")
     await callback.answer()
-
-# ===== User sends card list =====
 @router.message(RoyalMailStates.awaiting_cards)
 async def handle_card_list(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    username = message.from_user.username or "NoName"
+
     cards = [line.strip() for line in message.text.splitlines() if line.strip()]
     if not cards:
         await message.answer("❌ No cards found. Please send again.")
         return
 
+    # Register user if not exists
     user_balance = await get_balance(user_id)
     if user_balance is None:
-        await register_user(user_id, message.from_user.username or "NoName")
+        await register_user(user_id, username)
         user_balance = 0
+
+    # Check if user has enough credits for all cards
+    if user_balance < len(cards):
+        await message.answer(f"❌ Insufficient balance. You need {len(cards)} credits but have only {user_balance}.")
+        await state.clear()
+        return
 
     await message.answer(f"🔍 Received {len(cards)} card(s). Starting...")
 
-    for idx, card in enumerate(cards, start=1):
-        if user_balance < 1:
-            await message.answer("❌ Insufficient credits to continue processing cards.")
-            break  # Stop processing further cards
-
-        # Deduct 1 credit for this card
-        user_balance -= 1
-        await set_balance(user_id, user_balance)
-    
     live_cards = []  # to collect live cards
 
     for idx, card in enumerate(cards, start=1):
+        # Deduct 1 credit per card
+        user_balance -= 1
+        if user_balance < 0:
+            user_balance = 0
+        await set_balance(user_id, user_balance)
+
         await message.answer(f"📦 Processing card {idx}: `{card}`", parse_mode="Markdown")
         screenshot_path, status = await take_royalmail_screenshot(card)
 
