@@ -11,9 +11,13 @@ async def init_db_pool():
             CREATE TABLE IF NOT EXISTS users (
                 id BIGINT PRIMARY KEY,
                 username TEXT,
-                balance INTEGER DEFAULT 5,
+                balance INTEGER DEFAULT 0,
                 ovo_id TEXT
             );
+        """)
+        await conn.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS ovo_id TEXT;
         """)
 
 async def get_user(user_id):
