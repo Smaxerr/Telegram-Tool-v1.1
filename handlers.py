@@ -273,21 +273,17 @@ async def handle_card_list(message: Message, state: FSMContext):
         await message.answer("✅ All done.\n\nNo live cards found.")
 
     await state.clear()
-
-async def take_royalmail_screenshot(card: str) -> tuple:
+async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
     filename = f"screenshots/{uuid.uuid4()}.png"
     os.makedirs("screenshots", exist_ok=True)
 
     try:
-        # Parse card input
         card_parts = card.strip().split("|")
         if len(card_parts) != 4:
             print(f"[Invalid card format]: {card}")
             return None, "INVALID"
 
         card_number, exp_month, exp_year, cvv = card_parts
-
-        # Convert 2-digit year to 4-digit year
         if len(exp_year) == 2:
             exp_year = "20" + exp_year
 
@@ -303,23 +299,20 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             await page.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
             await page.goto("https://ovoenergypayments.paypoint.com/GuestPayment", timeout=60000)
 
-            # Fake user details
+            # Fake details
             name = faker.name()
             address1 = faker.street_address()
             city = faker.city()
             postcode = faker.postcode()
 
-            ovo_id = await get_ovo_id(message.from_user.id)
+            ovo_id = await get_ovo_id(user_id)
             if not ovo_id:
-                await message.reply("❌ You haven't set your OVO ID yet. Use /setovo to set it.")
-                return
+                return None, "NO_OVO_ID"
 
-            # Fill form
             await page.fill('#customerid', ovo_id)
             await page.fill('#amount', '1')
             await page.fill('#cardholdername', name)
 
-            # Iframe for card number
             frame_element = await page.wait_for_selector('iframe[src*="hostedfields.paypoint.services"]', timeout=10000)
             frame = await frame_element.content_frame()
             await frame.fill('input[name="card_number"]', card_number)
@@ -336,30 +329,24 @@ async def take_royalmail_screenshot(card: str) -> tuple:
             await page.check('input[name="AcceptedTermsAndConditions"]')
 
             await page.click('input#makePayment')
-
-
-            
             await page.wait_for_timeout(12000)
 
             status = "UNKNOWN"
-
             for frame in page.frames:
                 try:
-                    frame_content = await frame.content()
-                    lower = frame_content.lower()
-
-                    if "payment authorised" in lower:
+                    content = await frame.content()
+                    text = content.lower()
+                    if "payment authorised" in text:
                         status = "LIVE"
                         break
-                    elif any(word in lower for word in ["verify", "authorise", "otp", "confirm", "mobile app"]):
+                    elif any(w in text for w in ["verify", "otp", "authorise", "mobile app"]):
                         status = "OTP"
                         break
-                    elif "declined" in lower:
-                        status = "DEAD" 
+                    elif "declined" in text:
+                        status = "DEAD"
                         break
                 except Exception:
                     continue
-        
 
             await page.screenshot(path=filename, full_page=True)
             await browser.close()
