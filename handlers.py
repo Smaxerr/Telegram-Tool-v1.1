@@ -375,7 +375,7 @@ async def process_ovo_id(message: types.Message, state: FSMContext):
         await message.answer("❌ Invalid OVO Customer ID. Please send a valid number.")
         return
 
-    await set_ovo_customer_id(message.from_user.id, ovo_id)
+    await set_ovo_id(message.from_user.id, ovo_id)
     await message.answer(f"✅ Your OVO Customer ID has been saved:\n`{ovo_id}`", parse_mode="Markdown")
     await state.clear()
 
