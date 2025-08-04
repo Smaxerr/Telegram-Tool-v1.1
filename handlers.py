@@ -12,6 +12,8 @@ from states.bin_lookup import RoyalMailStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
 from aiogram.filters import Command
+from aiogram import types
+
 from faker import Faker
 
 faker = Faker("en_GB")
