@@ -402,6 +402,7 @@ async def process_ovo_id(message: types.Message, state: FSMContext):
 
 @router.callback_query(F.data == "back_main")
 async def back_main(cb: CallbackQuery):
+    await state.clear()
     balance = await get_balance(cb.from_user.id)
     username = cb.from_user.username or "NoUsername"
     
