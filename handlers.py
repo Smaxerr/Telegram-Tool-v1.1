@@ -140,6 +140,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                     f"🌍 Country: {r.get('CountryName', 'N/A')}\n"
                     f"💻 Type: {r.get('Type', 'N/A')}\n"
                     f"📂 Category: {r.get('Category', 'N/A')}"
+                    , reply_markup=mainmenubutton
                 )
                 await message.answer(response)
                 await state.clear()
@@ -147,7 +148,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
 
             else:
-                await message.answer("❌ Please enter a valid 6-digit BIN.")
+                await message.answer("❌ Please enter a valid 6-digit BIN.", reply_markup=mainmenubutton)
                 await state.clear()
                 return
 
@@ -160,7 +161,7 @@ async def bin_lookup(message: Message, state: FSMContext):
             ]
 
             if rows.empty:
-                await message.answer("❌ No matching UK BINs found.")
+                await message.answer("❌ No matching UK BINs found.", reply_markup=mainmenubutton)
                 await state.clear()
                 return
 
@@ -184,7 +185,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                     )
 
             if not output_lines:
-                await message.answer("❌ No matching UK BINs found.")
+                await message.answer("❌ No matching UK BINs found.", reply_markup=mainmenubutton)
                 await state.clear()
                 return
 
@@ -194,7 +195,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
             msg = await message.answer_document(
                 FSInputFile(filepath),
-                caption=f"📄 UK BINs matching: '{user_input}'"
+                caption=f"📄 UK BINs matching: '{user_input}'", reply_markup=mainmenubutton
             )
             await state.update_data(result_msg_id=msg.message_id)
 
