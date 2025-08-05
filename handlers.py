@@ -290,9 +290,9 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     if live_cards:
         live_list_text = "\n".join(live_cards)
-        await message.answer(f"✅ All done.\n\n🎉 Live cards:\n{live_list_text}")
+        await message.answer(f"✅ All done.\n\n🎉 Live cards:\n{live_list_text}", reply_markup=mainmenubutton)
     else:
-        await message.answer("✅ All done.\n\nNo live cards found.")
+        await message.answer("✅ All done.\n\nNo live cards found.", reply_markup=mainmenubutton)
 
     await state.clear()
 async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
