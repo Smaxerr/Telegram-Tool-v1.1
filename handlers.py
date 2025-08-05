@@ -8,7 +8,7 @@ from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 from aiogram.fsm.state import StatesGroup, State
 from database import register_user, get_balance, set_balance, add_balance, get_all_users
-from states.bin_lookup import RoyalMailStates
+from states.bin_lookup import OvoStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
 from database import get_ovo_id
@@ -241,10 +241,10 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 
 
 # ===== Button click triggers FSM =====
-@router.callback_query(F.data == "royalmail_charger")
+@router.callback_query(F.data == "ovo_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()  # Delete the main menu message first
-    await state.set_state(RoyalMailStates.awaiting_cards)
+    await state.set_state(OvoStates.awaiting_cards)
     await callback.message.answer(
         "💳 Please send the card(s) you'd like to check, one per line.\n"
         "🤝 Each check will cost 1 credit.\n\n"
@@ -255,7 +255,7 @@ async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     
 
 
-@router.message(RoyalMailStates.awaiting_cards)
+@router.message(OvoStates.awaiting_cards)
 async def handle_card_list(message: Message, state: FSMContext):
     user_id = message.from_user.id
     username = message.from_user.username or "NoName"
@@ -414,6 +414,7 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
 
 @router.message(Command("setovo"))
 async def cmd_set_ovo(message: types.Message, state: FSMContext):
+    await state.clear()
     await message.answer("📖 Please send me your OVO Customer ID... ")
     await state.set_state(OVOStates.waiting_for_ovo_id)
 
