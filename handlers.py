@@ -255,7 +255,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     # Check if user has enough credits for all cards
     if user_balance < len(cards):
-        await message.answer(f"❌ Insufficient balance. You need {len(cards)} credit(s) but have {user_balance} credits..", reply_markup=mainmenubutton)
+        await message.answer(f"❌ Insufficient balance. You need {len(cards)} credit(s) but have {user_balance} credits.", reply_markup=mainmenubutton)
         await state.clear()
         return
 
