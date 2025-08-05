@@ -225,9 +225,16 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 # ===== Button click triggers FSM =====
 @router.callback_query(F.data == "royalmail_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
+    await callback.message.delete()  # Delete the main menu message first
     await state.set_state(RoyalMailStates.awaiting_cards)
-    await callback.message.answer("💳 Please send the card(s) you'd like to check, one per line.\n🤝 Each check will cost 1 credit.\n\nFormat: cardnumber|expmonth|expyear|cvv", reply_markup=mainmenubutton)
+    await callback.message.answer(
+        "💳 Please send the card(s) you'd like to check, one per line.\n"
+        "🤝 Each check will cost 1 credit.\n\n"
+        "Format: cardnumber|expmonth|expyear|cvv",
+        reply_markup=mainmenubutton
+    )
     await callback.answer()
+    
 
 
 @router.message(RoyalMailStates.awaiting_cards)
