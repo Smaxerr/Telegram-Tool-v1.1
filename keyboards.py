@@ -4,6 +4,7 @@ def main_menu():
     kb = InlineKeyboardBuilder()
     kb.button(text="🔍Advanced BIN Lookup", callback_data="BINlookup")
     kb.button(text="⚡OvO Charger", callback_data="ovo_charger")
+    kb.button(text="⚡RM Charger", callback_data="rm_charger")
     kb.button(text="🧹Card Formatter", callback_data="ccformatter")
     kb.button(text="🔢 CC Count Checker", callback_data="bincountchecker")
     kb.button(text="⚙️Settings", callback_data="settings")
