@@ -62,6 +62,10 @@ binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
 ])
 
+mainmenubutton = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_main")]
+])
+
 @router.message(BinLookupState.waiting_for_bin)
 async def bin_lookup(message: Message, state: FSMContext):
     user_id = message.from_user.id
@@ -217,7 +221,7 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "royalmail_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RoyalMailStates.awaiting_cards)
-    await callback.message.answer("💳 Please send the card(s) you'd like to check, one per line.\n🤝 Each check will cost 1 credit.\n\nFormat: cardnumber|expmonth|expyear|cvv")
+    await callback.message.answer("💳 Please send the card(s) you'd like to check, one per line.\n🤝 Each check will cost 1 credit.\n\nFormat: cardnumber|expmonth|expyear|cvv", reply_markup=mainmenubutton)
     await callback.answer()
 
 
@@ -380,7 +384,7 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
 
 @router.message(Command("setovo"))
 async def cmd_set_ovo(message: types.Message, state: FSMContext):
-    await message.answer("Please send me your OVO Customer ID (a number).")
+    await message.answer("📖 Please send me your OVO Customer ID... ")
     await state.set_state(OVOStates.waiting_for_ovo_id)
 
 @router.message(OVOStates.waiting_for_ovo_id)
