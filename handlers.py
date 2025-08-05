@@ -127,7 +127,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                 rows = df[df['BIN'].astype(str) == user_input]
 
                 if rows.empty:
-                    await message.answer("❌ No matching UK BINs found.")
+                    await message.answer("❌ No matching UK BINs found.", reply_markup=mainmenubutton)
                     await state.clear()
                     return
 
@@ -141,7 +141,7 @@ async def bin_lookup(message: Message, state: FSMContext):
                     f"💻 Type: {r.get('Type', 'N/A')}\n"
                     f"📂 Category: {r.get('Category', 'N/A')}"
                 )
-                await message.answer(response)
+                await message.answer(response, reply_markup=mainmenubutton)
                 await state.clear()
                 return
 
