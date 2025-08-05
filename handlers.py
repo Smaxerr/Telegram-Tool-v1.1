@@ -56,39 +56,6 @@ from database import register_user, get_balance, set_balance
 from states import BinLookupState  # your FSM states module
 
 
-router = Router()
-
-BIN_LIST = ["492181", "537308", "438877"]  # Add more BINs here
-CATEGORY_ID = 1
-CHECK_INTERVAL = 5  # seconds
-
-API_URL = "https://api.razershop.cc/api/counts"
-AUTH_TOKEN = "205874d0-9f4f-4c0a-96d0-005a97291ad5"
-
-@router.message(lambda msg: msg.text.lower() == "bincountchecker")
-async def bin_checker_handler(message: Message):
-    await message.answer("Starting BIN count check...")
-
-    while True:
-        results = []
-        async with aiohttp.ClientSession() as session:
-            for bin_code in BIN_LIST:
-                try:
-                    url = f"{API_URL}?category_id={CATEGORY_ID}&filter=bin&value={bin_code}"
-                    headers = {"Authorization": AUTH_TOKEN}
-                    async with session.get(url, headers=headers) as response:
-                        data = await response.json()
-                        count = data[0]['count'] if isinstance(data, list) and data else 0
-                        results.append(f"BIN {bin_code}: {count} available")
-                except Exception as e:
-                    results.append(f"BIN {bin_code}: error - {e}")
-
-        # Send result to Telegram chat
-        await message.answer("\n".join(results))
-
-        await asyncio.sleep(CHECK_INTERVAL)
-
-
 CSV_URL = "https://raw.githubusercontent.com/venelinkochev/bin-list-data/refs/heads/master/bin-list-data.csv"  # Replace with your actual URL
 binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
