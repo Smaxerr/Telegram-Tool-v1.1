@@ -5,6 +5,7 @@ def main_menu():
     kb.button(text="🔍Advanced BIN Lookup", callback_data="BINlookup")
     kb.button(text="⚡OvO Charger", callback_data="royalmail_charger")
     kb.button(text="🧹Card Formatter", callback_data="ccformatter")
+    kb.button(text="⚙️Settings", callback_data="settings")
     kb.adjust(1)  # Each button takes 1 row
     return kb.as_markup()
 
