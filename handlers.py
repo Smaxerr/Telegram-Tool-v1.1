@@ -404,7 +404,7 @@ async def back_main(cb: CallbackQuery, state: FSMContext):  # ✅ Add FSMContext
     await state.clear()  # ✅ Clear any FSM state
 
     balance = await get_balance(cb.from_user.id)
-    username = cb.from_user.username or "NoUsername"
+    user_name = msg.from_user.full_name or msg.from_user.username or "User"
 
     text = (
         f"💻 Welcome to CypherBot, {user_name}.\n\n"
