@@ -399,12 +399,13 @@ async def process_ovo_id(message: types.Message, state: FSMContext):
     await set_ovo_id(message.from_user.id, ovo_id)
     await message.answer(f"✅ Your OVO Customer ID has been saved:\n`{ovo_id}`", parse_mode="Markdown")
     await state.clear()
+    
 @router.callback_query(F.data == "back_main")
-async def back_main(cb: CallbackQuery, state: FSMContext):  # ✅ Add FSMContext here
-    await state.clear()  # ✅ Clear any FSM state
+async def back_main(cb: CallbackQuery, state: FSMContext):
+    await state.clear()  # Clear FSM state
 
     balance = await get_balance(cb.from_user.id)
-    user_name = msg.from_user.full_name or msg.from_user.username or "User"
+    user_name = cb.from_user.full_name or cb.from_user.username or "User"  # ✅ use cb instead of msg
 
     text = (
         f"💻 Welcome to CypherBot, {user_name}.\n\n"
