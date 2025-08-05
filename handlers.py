@@ -221,6 +221,15 @@ async def ccformatter_placeholder(callback: CallbackQuery, state: FSMContext):
         reply_markup=mainmenubutton
     )
 
+@router.callback_query(F.data == "rm_charger")
+async def rm_charger_placeholder(callback: CallbackQuery, state: FSMContext):
+    await state.clear()  # ✅ Clear any FSM state
+    await callback.answer()  # Remove Telegram's loading spinner
+    await callback.message.edit_text(
+        "⚡RM Charger: Coming soon...",
+        reply_markup=mainmenubutton
+    )
+
 @router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     # Delete the main menu message
