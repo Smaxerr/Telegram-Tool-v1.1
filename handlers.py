@@ -140,7 +140,6 @@ async def bin_lookup(message: Message, state: FSMContext):
                     f"🌍 Country: {r.get('CountryName', 'N/A')}\n"
                     f"💻 Type: {r.get('Type', 'N/A')}\n"
                     f"📂 Category: {r.get('Category', 'N/A')}"
-                    , reply_markup=mainmenubutton
                 )
                 await message.answer(response)
                 await state.clear()
