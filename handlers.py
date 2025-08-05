@@ -432,7 +432,7 @@ async def back_main(cb: CallbackQuery, state: FSMContext):
 @router.message(F.text.startswith("/setbalance"))
 async def set_balance_cmd(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return await msg.reply("🚫 You’re not authorised to use this command."), reply_markup=mainmenubutton
+        return await msg.reply("🚫 You’re not authorised to use this command.", reply_markup=mainmenubutton)
     try:
         _, uid, amount = msg.text.split()
         await set_balance(int(uid), int(amount))
