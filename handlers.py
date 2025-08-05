@@ -221,6 +221,15 @@ async def ccformatter_placeholder(callback: CallbackQuery, state: FSMContext):
         reply_markup=mainmenubutton
     )
 
+@router.callback_query(F.data == "bincountchecker")
+async def bincountchecker_placeholder(callback: CallbackQuery, state: FSMContext):
+    await state.clear()  # ✅ Clear any FSM state
+    await callback.answer()  # Remove Telegram's loading spinner
+    await callback.message.edit_text(
+        "🧾 BIN Count Checker: Coming soon...",
+        reply_markup=mainmenubutton
+    )
+
 @router.callback_query(F.data == "rm_charger")
 async def rm_charger_placeholder(callback: CallbackQuery, state: FSMContext):
     await state.clear()  # ✅ Clear any FSM state
