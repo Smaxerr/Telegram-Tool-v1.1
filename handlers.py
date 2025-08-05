@@ -226,7 +226,7 @@ async def bincountchecker_placeholder(callback: CallbackQuery, state: FSMContext
     await state.clear()  # ✅ Clear any FSM state
     await callback.answer()  # Remove Telegram's loading spinner
     await callback.message.edit_text(
-        "🧾 BIN Count Checker: Coming soon...",
+        "🔢 BIN Count Checker: Coming soon...",
         reply_markup=mainmenubutton
     )
 
