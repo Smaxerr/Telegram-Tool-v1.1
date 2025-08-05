@@ -36,7 +36,7 @@ async def cmd_start(msg: Message):
     user_name = msg.from_user.full_name or msg.from_user.username or "User"
 
     text = (
-        f"💻 Welcome to CipherBot, {user_name}.\n\n"
+        f"💻 Welcome to CypherBot, {user_name}.\n\n"
         f"💰 You have **{balance}** credits remaining.\n\n"
         "Use the menu below to continue."
     )
