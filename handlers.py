@@ -208,8 +208,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 @router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     prompt = await callback.message.answer(
-        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):"
-    )
+        "🔍 Enter a BIN (6 digits) or a keyword (e.g. bank name, 'credit', 'debit'):", reply_markup=mainmenubutton)
     await state.update_data(prompt_id=prompt.message_id)
     await state.set_state(BinLookupState.waiting_for_bin)
     await callback.answer()
