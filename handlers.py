@@ -204,6 +204,15 @@ async def bin_lookup(message: Message, state: FSMContext):
 
     await state.clear()
 
+@router.callback_query(F.data == "settings")
+async def settings_placeholder(callback: CallbackQuery, state: FSMContext):
+    await state.clear()  # ✅ Clear any active FSM state
+    await callback.answer()  # Remove loading spinner
+    await callback.message.edit_text(
+        "⚙️ Settings: Coming soon...",
+        reply_markup=mainmenubutton
+    )
+
 @router.callback_query(F.data == "BINlookup")
 async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
     # Delete the main menu message
@@ -427,6 +436,7 @@ async def back_main(cb: CallbackQuery, state: FSMContext):
 
     await cb.message.edit_text(text, reply_markup=main_menu())
     await cb.answer()
+
 
 
 @router.message(F.text.startswith("/setbalance"))
