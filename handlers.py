@@ -147,7 +147,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
 
             else:
-                await message.answer("❌ Please enter a valid 6-digit BIN.", reply_markup=mainmenubutton)
+                await message.answer("❌ Enter a valid 6-digit BIN.", reply_markup=mainmenubutton)
                 await state.clear()
                 return
 
@@ -246,7 +246,7 @@ async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()  # Delete the main menu message first
     await state.set_state(OvoStates.awaiting_cards)
     await callback.message.answer(
-        "💳 Please send the card(s) you'd like to check, one per line.\n"
+        "💳 Send the card(s) you'd like to check, one per line.\n"
         "🤝 Each check will cost 1 credit.\n\n"
         "Format: cardnumber|expmonth|expyear|cvv",
         reply_markup=mainmenubutton
@@ -262,7 +262,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     cards = [line.strip() for line in message.text.splitlines() if line.strip()]
     if not cards:
-        await message.answer("❌ No cards found. Please send again.")
+        await message.answer("❌ No cards found. Try again.")
         return
 
     # Register user if not exists
@@ -415,7 +415,7 @@ async def take_royalmail_screenshot(user_id: int, card: str) -> tuple:
 @router.message(Command("setovo"))
 async def cmd_set_ovo(message: types.Message, state: FSMContext):
     await state.clear()
-    await message.answer("📖 Please send me your OVO Customer ID... ")
+    await message.answer("📖Send me your OVO Customer ID... ", reply_markup=mainmenubutton)
     await state.set_state(OVOStates.waiting_for_ovo_id)
 
 @router.message(OVOStates.waiting_for_ovo_id)
@@ -424,7 +424,7 @@ async def process_ovo_id(message: types.Message, state: FSMContext):
 
     # Optionally validate ovo_id here (for example, length check)
     if not ovo_id.isdigit() or len(ovo_id) < 10:
-        await message.answer("❌ Invalid OVO Customer ID. Please send a valid number.")
+        await message.answer("❌ Invalid OVO Customer ID. Send a valid number.")
         return
 
     await set_ovo_id(message.from_user.id, ovo_id)
