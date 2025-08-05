@@ -55,6 +55,9 @@ from aiogram.fsm.context import FSMContext
 from database import register_user, get_balance, set_balance
 from states import BinLookupState  # your FSM states module
 
+
+router = Router()
+
 BIN_LIST = ["492181", "537308", "438877"]  # Add more BINs here
 CATEGORY_ID = 1
 CHECK_INTERVAL = 5  # seconds
