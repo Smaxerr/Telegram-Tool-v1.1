@@ -79,7 +79,7 @@ async def bin_lookup(message: Message, state: FSMContext):
 
     if user_balance < 0.1:
         await message.answer(
-            "❌ Insufficient balance to perform BIN lookup."
+            "❌ Insufficient balance to perform BIN lookup.", reply_markup=mainmenubutton
         )
         await state.clear()
         return
@@ -255,7 +255,7 @@ async def handle_card_list(message: Message, state: FSMContext):
 
     # Check if user has enough credits for all cards
     if user_balance < len(cards):
-        await message.answer(f"❌ Insufficient balance. You need {len(cards)} credits but have only {user_balance}.")
+        await message.answer(f"❌ Insufficient balance. You need {len(cards)} credit(s) but have {user_balance} credits..", reply_markup=mainmenubutton)
         await state.clear()
         return
 
@@ -432,7 +432,7 @@ async def back_main(cb: CallbackQuery, state: FSMContext):
 @router.message(F.text.startswith("/setbalance"))
 async def set_balance_cmd(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return await msg.reply("🚫 You’re not authorized to use this command.")
+        return await msg.reply("🚫 You’re not authorised to use this command."), reply_markup=mainmenubutton
     try:
         _, uid, amount = msg.text.split()
         await set_balance(int(uid), int(amount))
@@ -443,7 +443,7 @@ async def set_balance_cmd(msg: Message):
 @router.message(F.text.startswith("/addbalance"))
 async def add_balance_cmd(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return await msg.reply("🚫 You’re not authorized to use this command.")
+        return await msg.reply("🚫 You’re not authorised to use this command.", reply_markup=mainmenubutton)
     try:
         _, uid, amount = msg.text.split()
         await add_balance(int(uid), int(amount))
@@ -454,7 +454,7 @@ async def add_balance_cmd(msg: Message):
 @router.message(F.text == "/viewusers")
 async def view_users(msg: Message):
     if msg.from_user.id not in ADMIN_IDS:
-        return await msg.reply("🚫 You’re not authorized to use this command.")
+        return await msg.reply("🚫 You’re not authorised to use this command.", reply_markup=mainmenubutton)
 
     users = await get_all_users()
     lines = [
@@ -466,4 +466,5 @@ async def view_users(msg: Message):
     buffer = io.BytesIO(text.encode("utf-8"))
     file = BufferedInputFile(buffer.getvalue(), filename="users.txt")
 
-    await msg.answer_document(file, caption="📄 All registered users")
+    await msg.answer_document(file, caption="📄 All registered users", reply_markup=mainmenubutton
+)
