@@ -217,7 +217,7 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "royalmail_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RoyalMailStates.awaiting_cards)
-    await callback.message.answer("💳 Please send the card(s) you'd like to check, one per line.\nFormat: cardnumber|expmonth|expyear|cvv\n🤝 Each check will cost 1 credit. ")
+    await callback.message.answer("💳 Please send the card(s) you'd like to check, one per line.\n🤝 Each check will cost 1 credit.\n\nFormat: cardnumber|expmonth|expyear|cvv")
     await callback.answer()
 
 
