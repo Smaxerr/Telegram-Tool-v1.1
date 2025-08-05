@@ -399,21 +399,21 @@ async def process_ovo_id(message: types.Message, state: FSMContext):
     await set_ovo_id(message.from_user.id, ovo_id)
     await message.answer(f"✅ Your OVO Customer ID has been saved:\n`{ovo_id}`", parse_mode="Markdown")
     await state.clear()
-
 @router.callback_query(F.data == "back_main")
-async def back_main(cb: CallbackQuery):
-    await state.clear()
+async def back_main(cb: CallbackQuery, state: FSMContext):  # ✅ Add FSMContext here
+    await state.clear()  # ✅ Clear any FSM state
+
     balance = await get_balance(cb.from_user.id)
     username = cb.from_user.username or "NoUsername"
-    
+
     text = (
-        f"💻 Welcome to CypherBot, {username}.\n\n"
-        f"💰 You have **{balance}** credits remaining.\n\n"
+        f"💻 Welcome to CypherBot, {user_name}.\n\n"
+        f"💰 You have {balance} credits remaining.\n\n"
         "Use the menu below to continue."
     )
-    
+
     await cb.message.edit_text(text, reply_markup=main_menu())
-    await cb.answer()  # optionally answer the callback to remove loading spinner
+    await cb.answer()
 
 
 @router.message(F.text.startswith("/setbalance"))
