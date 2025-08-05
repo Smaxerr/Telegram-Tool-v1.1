@@ -217,8 +217,10 @@ async def start_bin_lookup(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "royalmail_charger")
 async def royalmail_callback(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RoyalMailStates.awaiting_cards)
-    await callback.message.answer("Please send the card(s), one per line:")
+    await callback.message.answer("Please send the card(s) you'd like to check, one per line:\n Format: cardnumber|expmonth|expyear|cvv")
     await callback.answer()
+
+
 @router.message(RoyalMailStates.awaiting_cards)
 async def handle_card_list(message: Message, state: FSMContext):
     user_id = message.from_user.id
@@ -244,7 +246,7 @@ async def handle_card_list(message: Message, state: FSMContext):
     ovo_id = await get_ovo_id(message.from_user.id)
 
     await message.answer(
-        f"🔍 Received {len(cards)} card(s). Starting...\n"
+        f"🔍 Received {len(cards)} card(s).\n"
         f"⏳ Using your saved OVO ID: {ovo_id}\n"
         f"💸 Deducting {len(cards)} credit(s) from your balance."
     )
