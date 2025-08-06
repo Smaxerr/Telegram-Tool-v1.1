@@ -3,6 +3,8 @@ import json
 import os
 
 import asyncio
+from aiogram.types import CallbackQuery
+
 
 user_autobuy_tasks = {}
 
