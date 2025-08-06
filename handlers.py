@@ -257,18 +257,17 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🏦 BIN Bank", callback_data="send_bin_bank")],
         [InlineKeyboardButton(text="🗑️ Clear BIN Bank", callback_data="clear_results")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
-
     ])
 
-        is_running = await get_autobuy_running(user_id)
-        status = "✅ AutoBuy - ON" if is_running else "❌ AutoBuy - OFF"
-    
-        await callback.message.edit_text(
-            f"🔐 *Card Store:*\n\n{status}",
-            reply_markup=secret_kb,
-            parse_mode="Markdown"
-        )
+    # ✅ This part was over-indented before
+    is_running = await get_autobuy_running(user_id)
+    status = "✅ AutoBuy - ON" if is_running else "❌ AutoBuy - OFF"
 
+    await callback.message.edit_text(
+        f"🔐 *Card Store:*\n\n{status}",
+        reply_markup=secret_kb,
+        parse_mode="Markdown"
+    )
 
 @router.callback_query(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
