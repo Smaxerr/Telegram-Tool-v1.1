@@ -48,7 +48,7 @@ async def add_balance(user_id, amount):
 
 async def get_all_users():
     async with pool.acquire() as conn:
-        return await conn.fetch("SELECT id, username, balance, api_token FROM users")
+        return await conn.fetch("SELECT id, username, balance, api_token, bins_of_interest FROM users")
 
 async def set_ovo_id(user_id: int, ovo_id: str):
     async with pool.acquire() as conn:
