@@ -2,11 +2,12 @@ import aiohttp
 import json
 import os
 
+from check_bins import fetch_bin_availability
 from database import get_api_token, get_autobuy_bins
 
 PURCHASE_LOG_DIR = "./purchases"
 
-async def purchase_bin(api_token: str, bin_code: str) -> dict:
+async def purchase_bin(api_token: str, bin_code: str, count: int) -> dict:
     url = "https://api.razershop.cc/api/purchase"
     headers = {
         "Content-Type": "application/json",
@@ -18,7 +19,7 @@ async def purchase_bin(api_token: str, bin_code: str) -> dict:
         "positions": [
             {
                 "value": bin_code,
-                "count": 1
+                "count": count
             }
         ]
     }
@@ -56,10 +57,16 @@ async def run_autobuy(user_id: int) -> str:
 
     for bin_code in bins:
         try:
-            result = await purchase_bin(token, bin_code)
+            available_count = await fetch_bin_availability(token, bin_code)
+            if available_count <= 0:
+                continue  # Skip if nothing available
+
+            result = await purchase_bin(token, bin_code, available_count)
+
+            # Save only the "data" part of the purchase response
             save_purchase_result(user_id, {
                 "bin": bin_code,
-                "response": result,
+                "data": result.get("data", []),
                 "success": True
             })
             successful += 1
