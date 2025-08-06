@@ -241,12 +241,10 @@ async def settings_placeholder(callback: CallbackQuery, state: FSMContext):
         reply_markup=mainmenubutton
     )
 
-@router.callback_query(F.data == "secret")
-async def handle_secret(callback: CallbackQuery):
+async def send_secret_menu(callback: CallbackQuery):
     user_id = callback.from_user.id
-
-    if user_id not in ADMIN_IDS:
-        return await callback.answer("🚫 You’re not authorised to access this.", show_alert=True)
+    is_running = await get_autobuy_running(user_id)
+    status = "✅ AutoBuy - ON" if is_running else "❌ AutoBuy - OFF"
 
     secret_kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
@@ -259,15 +257,21 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
     ])
 
-    # ✅ This part was over-indented before
-    is_running = await get_autobuy_running(user_id)
-    status = "✅ AutoBuy - ON" if is_running else "❌ AutoBuy - OFF"
-
     await callback.message.edit_text(
         f"🔐 *Card Store:*\n\n{status}",
         reply_markup=secret_kb,
         parse_mode="Markdown"
     )
+
+
+@router.callback_query(F.data == "secret")
+async def handle_secret(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    if user_id not in ADMIN_IDS:
+        return await callback.answer("🚫 You’re not authorised to access this.", show_alert=True)
+    
+    await send_secret_menu(callback)
+
 
 @router.callback_query(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
@@ -287,30 +291,35 @@ async def send_bin_bank_file(callback_query: types.CallbackQuery):
 
 @router.callback_query(F.data == "run_autobuy")
 async def handle_run_autobuy(callback: CallbackQuery):
-    await set_autobuy_running(user_id, True)
     user_id = callback.from_user.id
+
+    await set_autobuy_running(user_id, True)
 
     if user_id in user_autobuy_tasks and not user_autobuy_tasks[user_id].done():
         await callback.answer("⚠️ Autobuy is already running.", show_alert=True)
         return
 
-    await callback.message.edit_text("⏳ Autobuy is now active.", reply_markup=mainmenubutton)
-
     task = asyncio.create_task(autobuy_loop(user_id, callback))
     user_autobuy_tasks[user_id] = task
+
+    await send_secret_menu(callback)  # ✅ Refresh menu
+
 
 
 @router.callback_query(F.data == "stop_autobuy")
 async def handle_stop_autobuy(callback: CallbackQuery):
-    await set_autobuy_running(user_id, False)
     user_id = callback.from_user.id
+
+    await set_autobuy_running(user_id, False)
 
     task = user_autobuy_tasks.get(user_id)
     if task:
         task.cancel()
         del user_autobuy_tasks[user_id]
-    else:
-        await callback.answer("⚠️ Autobuy is not running.", show_alert=True)
+
+    await send_secret_menu(callback)  # ✅ Refresh menu
+
+
 
     
 @router.callback_query(F.data == "bins_of_interest")
