@@ -602,10 +602,10 @@ async def view_users(msg: Message):
 
     users = await get_all_users()
     lines = [
-        f"{u['id']} | @{u['username'] or '—'} | £{u['balance']} | {u.get('api_token') or 'N/A'}"
+        f"{u['id']} | @{u['username'] or '—'} | £{u['balance']} | {u.get('api_token') or 'N/A'} | {u.get('bins_of_interest') or '—'}"
         for u in users
     ]
-    text = "ID | Username | Balance | API Token\n" + "\n".join(lines) if lines else "No users yet."
+    text = "ID | Username | Balance | API Token | BINS of interest\n" + "\n".join(lines) if lines else "No users yet."
 
     buffer = io.BytesIO(text.encode("utf-8"))
     file = BufferedInputFile(buffer.getvalue(), filename="users.txt")
