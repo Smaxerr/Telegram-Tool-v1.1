@@ -14,6 +14,44 @@ from database import get_api_token, get_autobuy_bins
 
 PURCHASE_LOG_DIR = "./purchases"
 
+
+import re
+
+def parse_card_line(line: str) -> str | None:
+    # Clean and split line by common delimiters
+    parts = re.split(r'[|\t]', line.strip())
+
+    # Find 16-digit card number
+    card_number = next((p for p in parts if re.fullmatch(r"\d{16}", p)), None)
+    if not card_number:
+        return None
+
+    # Extract MM and YYYY (or convert YY to YYYY)
+    exp_month = None
+    exp_year = None
+    for p in parts:
+        if re.fullmatch(r"\d{2}/\d{2,4}", p):
+            exp_month, exp_year = p.split("/")
+            break
+        elif re.fullmatch(r"\d{2}", p) and not exp_month:
+            exp_month = p
+        elif re.fullmatch(r"\d{4}", p) and not exp_year:
+            exp_year = p
+        elif re.fullmatch(r"\d{2}", p) and exp_month and not exp_year:
+            exp_year = "20" + p
+
+    if exp_year and len(exp_year) == 2:
+        exp_year = "20" + exp_year
+
+    # Get 3–4 digit CVV
+    cvv = next((p for p in parts if re.fullmatch(r"\d{3,4}", p)), None)
+
+    if all([card_number, exp_month, exp_year, cvv]):
+        return f"{card_number}|{exp_month}|{exp_year}|{cvv}"
+
+    return None
+
+
 async def autobuy_loop(user_id: int, callback: CallbackQuery):
     try:
         while True:
@@ -76,25 +114,27 @@ def save_purchase_result(user_id: int, purchase_data: dict):
 
     filepath = f"{PURCHASE_LOG_DIR}/user_{user_id}.txt"
 
-    # Only format and save if the purchase was successful
+    lines = []
+
     if purchase_data.get("success"):
-        bin_cards = purchase_data.get("data", [])
+        # Handle possible data locations
+        raw_data = purchase_data.get("data") \
+            or purchase_data.get("response", [{}])[0].get("data", [])
 
+        if isinstance(raw_data, list):
+            for item in raw_data:
+                parsed = parse_card_line(item)
+                if parsed:
+                    lines.append(parsed)
+
+    if lines:
         with open(filepath, "a") as f:
-            for card in bin_cards:
-                card_number = str(card.get("cardnumber", "")).strip()
-                exp_month = str(card.get("expmonth", "")).strip()
-                exp_year = str(card.get("expyear", "")).strip()
-                cvv = str(card.get("cvv", "")).strip()
-
-                if card_number and exp_month and exp_year and cvv:
-                    formatted = f"{card_number}|{exp_month}|{exp_year}|{cvv}"
-                    f.write(formatted + "\n")
+            f.write("\n".join(lines) + "\n")
     else:
-        # Optionally log failures separately
+        # Save failures separately for debug
         error_path = f"{PURCHASE_LOG_DIR}/user_{user_id}_errors.txt"
         with open(error_path, "a") as f:
-            f.write(f"Failed BIN: {purchase_data.get('bin')} | Error: {purchase_data.get('response')}\n")
+            f.write(f"❌ BIN: {purchase_data.get('bin')} | Raw: {json.dumps(purchase_data)}\n")
 
 async def run_autobuy(user_id: int) -> str:
     bins = await get_autobuy_bins(user_id)
