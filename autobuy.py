@@ -4,33 +4,33 @@ import os
 
 from database import get_api_token, get_autobuy_bins
 
-# Folder where purchases are logged
 PURCHASE_LOG_DIR = "./purchases"
 
 async def purchase_bin(api_token: str, bin_code: str) -> dict:
-    """
-    Makes a POST request to the purchase API for a given BIN using the user's token.
-    """
     url = "https://api.razershop.cc/api/purchase"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_token}"
     }
     payload = {
-        "bin": bin_code
+        "filter": "bin",
+        "category_id": 1,
+        "positions": [
+            {
+                "value": bin_code,
+                "count": 1
+            }
+        ]
     }
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, json=payload) as resp:
+            text = await resp.text()
             if resp.status != 200:
-                text = await resp.text()
                 raise Exception(f"Purchase failed with status {resp.status}: {text}")
             return await resp.json()
 
 def save_purchase_result(user_id: int, purchase_data: dict):
-    """
-    Saves a single purchase result (success or failure) to the user's text file.
-    """
     if not os.path.exists(PURCHASE_LOG_DIR):
         os.makedirs(PURCHASE_LOG_DIR)
 
