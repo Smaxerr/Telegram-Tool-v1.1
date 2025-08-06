@@ -241,7 +241,7 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
         [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="bins_of_interest")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="autobuy_bins")],
-        InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy"),
+        [InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
     ])
