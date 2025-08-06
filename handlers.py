@@ -244,18 +244,23 @@ async def handle_secret(callback: CallbackQuery):
     ])
 
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
-
+    
 @router.callback_query(F.data == "bins_of_interest")
 async def show_bins_of_interest(callback: CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
     bins = await get_bins_of_interest(user_id)
-    bin_text = "\n".join(bins) if bins else "No BINs of interest yet."
+
+    # Sort numerically if bins exist
+    sorted_bins = sorted(bins, key=lambda x: int(x)) if bins else []
+    bin_text = "\n".join(sorted_bins) if sorted_bins else "No BINs of interest yet."
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Add BIN", callback_data="add_bin_of_interest")],
         [InlineKeyboardButton(text="➖ Remove BIN", callback_data="remove_bin_of_interest")],
         [InlineKeyboardButton(text="⬅️ Back", callback_data="back_to_main")]
     ])
+
+    await callback.message.edit_text(f"📊 Your BINs of interest:\n\n{bin_text}", reply_markup=keyboard)
 
     await callback.message.edit_text(
         f"💳 Your BINs of Interest:\n\n{bin_text}",
