@@ -22,7 +22,25 @@ async def autobuy_loop(user_id: int, callback: CallbackQuery):
     except asyncio.CancelledError:
         await callback.message.edit_text("⏹️ Autobuy stopped.")
 
+async def start_autobuy_loop(user_id: int, callback: CallbackQuery):
+    # Cancel existing task if running
+    if user_id in user_autobuy_tasks:
+        task = user_autobuy_tasks[user_id]
+        if not task.done():
+            task.cancel()
 
+    # Start new task
+    task = asyncio.create_task(autobuy_loop(user_id, callback))
+    user_autobuy_tasks[user_id] = task
+
+
+async def stop_autobuy_loop(user_id: int):
+    if user_id in user_autobuy_tasks:
+        task = user_autobuy_tasks[user_id]
+        if not task.done():
+            task.cancel()
+            await asyncio.sleep(0.1)  # allow cancellation to propagate
+            
 async def purchase_bin(api_token: str, bin_code: str, count: int) -> dict:
     url = "https://api.razershop.cc/api/purchase"
     headers = {
