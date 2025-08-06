@@ -284,8 +284,15 @@ async def process_add_bin(msg: Message, state: FSMContext):
         return await msg.reply("❌ Please send a valid 6-digit BIN.")
     
     await add_bin_of_interest(msg.from_user.id, bin_code)
-    await msg.reply(f"✅ BIN `{bin_code}` has been added.", parse_mode="Markdown")
     await state.clear()
+
+    # Inline buttons for follow-up actions
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➕ Add Another BIN", callback_data="add_bin_of_interest")],
+        [InlineKeyboardButton(text="⬅️ Back to Main Menu", callback_data="back_to_main")]
+    ])
+
+    await msg.answer(f"✅ BIN `{bin_code}` has been added.", parse_mode="Markdown", reply_markup=keyboard)
 
 @router.message(BINInterestStates.waiting_for_bin_remove)
 async def process_remove_bin(msg: Message, state: FSMContext):
