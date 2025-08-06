@@ -40,10 +40,6 @@ def save_purchase_result(user_id: int, purchase_data: dict):
         f.write(json.dumps(purchase_data) + "\n")
 
 async def run_autobuy(user_id: int) -> str:
-    """
-    Executes autobuy by running purchases on all saved BINs for the user.
-    Logs results and returns a summary message.
-    """
     bins = await get_autobuy_bins(user_id)
     token = await get_api_token(user_id)
 
@@ -63,10 +59,17 @@ async def run_autobuy(user_id: int) -> str:
 
             result = await purchase_bin(token, bin_code, available_count)
 
-            # Save only the "data" part of the purchase response
+            # result is a list of purchase results
+            all_data = []
+            if isinstance(result, list):
+                for item in result:
+                    all_data.extend(item.get("data", []))
+            else:
+                all_data = result.get("data", [])
+
             save_purchase_result(user_id, {
                 "bin": bin_code,
-                "data": result.get("data", []),
+                "data": all_data,
                 "success": True
             })
             successful += 1
