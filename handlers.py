@@ -249,8 +249,7 @@ async def handle_secret(callback: CallbackQuery):
 
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
 
-
-@dp.callback_query_handler(lambda c: c.data == "send_bin_bank")
+@dp.callback_query(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     filepath = f"./purchases/user_{user_id}.txt"
@@ -259,10 +258,12 @@ async def send_bin_bank_file(callback_query: types.CallbackQuery):
         await callback_query.answer("❌ No BIN Bank file found.", show_alert=True)
         return
 
-    await callback_query.answer()  # Acknowledge callback to remove "loading"
+    await callback_query.answer()  # Acknowledge callback
     with open(filepath, "rb") as file:
-        await callback_query.message.answer_document(document=file, caption="📁 Your BIN Bank purchase log")
-        
+        await callback_query.message.answer_document(
+            document=file,
+            caption="📁 Your BIN Bank purchase log"
+        )
 
 @router.callback_query(F.data == "run_autobuy")
 async def handle_run_autobuy(callback: CallbackQuery):
