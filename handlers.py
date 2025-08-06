@@ -220,10 +220,10 @@ async def handle_secret(callback: CallbackQuery):
         return await callback.answer("🚫 You’re not authorised to access this.", show_alert=True)
 
     secret_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("💳 Cards of Interest", callback_data="cards_interest")],
-        [InlineKeyboardButton("🔑 API Token", callback_data="api_token")],
-        [InlineKeyboardButton("🛒 Cards to Autobuy", callback_data="cards_autobuy")],
-        [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]
+        [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="cards_interest")],
+        [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
+        [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="cards_autobuy")],
+        [InlineKeyboardButton(text="🔙 Back", callback_data="back_to_main")]
     ])
 
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
@@ -240,9 +240,6 @@ async def handle_api_token(callback: CallbackQuery):
 async def handle_cards_autobuy(callback: CallbackQuery):
     await callback.message.edit_text("🛒 Cards to Autobuy (coming soon)")
 
-@router.callback_query(F.data == "back_to_main")
-async def handle_back_to_main(callback: CallbackQuery):
-    await callback.message.edit_text("🏠 Main Menu", reply_markup=main_menu_kb)
 
 @router.callback_query(F.data == "ccformatter")
 async def ccformatter_placeholder(callback: CallbackQuery, state: FSMContext):
