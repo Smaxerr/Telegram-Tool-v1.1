@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 from aiogram.fsm.state import StatesGroup, State
-from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token
+from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bins_of_interest, remove_bins_of_interest
 from states.bin_lookup import OvoStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
@@ -235,8 +235,8 @@ async def handle_secret(callback: CallbackQuery):
         return await callback.answer("🚫 You’re not authorised to access this.", show_alert=True)
 
     secret_kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="cards_interest")],
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
+        [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="bins_of_interest")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="cards_autobuy")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
@@ -244,9 +244,53 @@ async def handle_secret(callback: CallbackQuery):
 
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
 
-@router.callback_query(F.data == "cards_interest")
-async def handle_cards_interest(callback: CallbackQuery):
-    await callback.message.edit_text("💳 Cards of Interest (coming soon)", reply_markup=mainmenubutton)
+@router.callback_query(F.data == "bins_of_interest")
+async def show_bins_of_interest(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    bins = await get_bins_of_interest(user_id)
+    bin_text = "\n".join(bins) if bins else "No BINs of interest yet."
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➕ Add BIN", callback_data="add_bin_of_interest")],
+        [InlineKeyboardButton(text="➖ Remove BIN", callback_data="remove_bin_of_interest")],
+        [InlineKeyboardButton(text="⬅️ Back", callback_data="back_to_main")]
+    ])
+
+    await callback.message.edit_text(
+        f"💳 Your BINs of Interest:\n\n{bin_text}",
+        reply_markup=keyboard
+    )
+
+@router.callback_query(F.data == "add_bin_of_interest")
+async def ask_bin_to_add(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("✏️ Send the 6-digit BIN you want to add:")
+    await state.set_state(BINInterestStates.waiting_for_bin_add)
+
+@router.callback_query(F.data == "remove_bin_of_interest")
+async def ask_bin_to_remove(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("✏️ Send the 6-digit BIN you want to remove:")
+    await state.set_state(BINInterestStates.waiting_for_bin_remove)
+
+@router.message(BINInterestStates.waiting_for_bin_add)
+async def process_add_bin(msg: Message, state: FSMContext):
+    bin_code = msg.text.strip()
+    if not bin_code.isdigit() or len(bin_code) != 6:
+        return await msg.reply("❌ Please send a valid 6-digit BIN.")
+    
+    await add_bin_of_interest(msg.from_user.id, bin_code)
+    await msg.reply(f"✅ BIN `{bin_code}` has been added.", parse_mode="Markdown")
+    await state.clear()
+
+@router.message(BINInterestStates.waiting_for_bin_remove)
+async def process_remove_bin(msg: Message, state: FSMContext):
+    bin_code = msg.text.strip()
+    if not bin_code.isdigit() or len(bin_code) != 6:
+        return await msg.reply("❌ Please send a valid 6-digit BIN.")
+    
+    await remove_bin_of_interest(msg.from_user.id, bin_code)
+    await msg.reply(f"✅ BIN `{bin_code}` has been removed.", parse_mode="Markdown")
+    await state.clear()
+
 
 class APITokenStates(StatesGroup):
     waiting_for_api_token = State()
