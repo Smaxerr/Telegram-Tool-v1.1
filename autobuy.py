@@ -54,12 +54,14 @@ async def run_autobuy(user_id: int) -> str:
     for bin_code in bins:
         try:
             available_count = await fetch_bin_availability(token, bin_code)
-            if available_count <= 0:
+            print(f"BIN {bin_code} availability: {available_count}")  # Debug log
+
+            if not available_count or available_count <= 0:
+                print(f"Skipping BIN {bin_code} due to zero availability")
                 continue  # Skip if nothing available
 
             result = await purchase_bin(token, bin_code, available_count)
 
-            # result is a list of purchase results
             all_data = []
             if isinstance(result, list):
                 for item in result:
