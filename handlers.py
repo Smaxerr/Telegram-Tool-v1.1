@@ -248,9 +248,27 @@ async def handle_secret(callback: CallbackQuery):
 async def handle_cards_interest(callback: CallbackQuery):
     await callback.message.edit_text("💳 Cards of Interest (coming soon)", reply_markup=mainmenubutton)
 
+class APITokenStates(StatesGroup):
+    waiting_for_api_token = State()
+
 @router.callback_query(F.data == "api_token")
-async def handle_api_token(callback: CallbackQuery):
-    await callback.message.edit_text("🔑 API Token (coming soon)", reply_markup=mainmenubutton)
+async def start_api_token_process(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    if user_id not in ADMIN_IDS:
+        return await callback.answer("🚫 You’re not authorised.", show_alert=True)
+    await state.set_state(APITokenStates.waiting_for_api_token)
+    await callback.message.edit_text("🔑 Please send me your API token.")
+
+@router.message(APITokenStates.waiting_for_api_token)
+async def process_api_token(message: Message, state: FSMContext):
+    api_token = message.text.strip()
+    user_id = message.from_user.id
+
+    # Optionally validate api_token here (length, format, etc.)
+
+    await set_api_token(user_id, api_token)
+    await message.answer(f"✅ Your API token has been saved:\n`{api_token}`", parse_mode="Markdown")
+    await state.clear()
 
 @router.callback_query(F.data == "cards_autobuy")
 async def handle_cards_autobuy(callback: CallbackQuery):
