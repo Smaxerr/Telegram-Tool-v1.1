@@ -8,7 +8,7 @@ from aiogram.types import CallbackQuery
 
 user_autobuy_tasks = {}
 
-from keyboards import mainmenubutton
+from handlers import mainmenubutton
 from check_bins import fetch_bin_availability
 from database import get_api_token, get_autobuy_bins
 
