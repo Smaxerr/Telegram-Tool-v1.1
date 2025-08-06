@@ -294,15 +294,23 @@ async def process_add_bin(msg: Message, state: FSMContext):
 
     await msg.answer(f"✅ BIN `{bin_code}` has been added.", parse_mode="Markdown", reply_markup=keyboard)
 
+
 @router.message(BINInterestStates.waiting_for_bin_remove)
 async def process_remove_bin(msg: Message, state: FSMContext):
     bin_code = msg.text.strip()
     if not bin_code.isdigit() or len(bin_code) != 6:
         return await msg.reply("❌ Please send a valid 6-digit BIN.")
-    
+
     await remove_bin_of_interest(msg.from_user.id, bin_code)
-    await msg.reply(f"✅ BIN `{bin_code}` has been removed.", parse_mode="Markdown")
     await state.clear()
+
+    # Inline buttons for follow-up actions
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➖ Remove Another BIN", callback_data="remove_bin_of_interest")],
+        [InlineKeyboardButton(text="⬅️ Back to Main Menu", callback_data="back_to_main")]
+    ])
+
+    await msg.answer(f"✅ BIN `{bin_code}` has been removed.", parse_mode="Markdown", reply_markup=keyboard)
 
 
 class APITokenStates(StatesGroup):
