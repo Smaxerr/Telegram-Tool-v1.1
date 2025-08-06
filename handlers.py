@@ -272,11 +272,8 @@ async def handle_run_autobuy(callback: CallbackQuery):
 
     result_message = await run_autobuy(user_id)
 
-    filepath = f"purchases/user_{user_id}.txt"
-    if os.path.exists(filepath):
-        await callback.message.answer_document(FSInputFile(filepath), caption=result_message)
-    else:
-        await callback.message.answer(result_message)
+    # Just send the text result, no file
+    await callback.message.edit_text(result_message)
     
 @router.callback_query(F.data == "bins_of_interest")
 async def show_bins_of_interest(callback: CallbackQuery, state: FSMContext):
