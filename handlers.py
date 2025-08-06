@@ -250,7 +250,7 @@ async def handle_secret(callback: CallbackQuery):
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
 
 
-@dp.callback_query_handler(lambda c: c.data == "send_bin_bank")
+@router.callback_query_handler(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
     user_id = callback_query.from_user.id
     filepath = f"./purchases/user_{user_id}.txt"
