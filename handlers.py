@@ -259,11 +259,11 @@ async def send_bin_bank_file(callback_query: types.CallbackQuery):
         return
 
     await callback_query.answer()  # Acknowledge callback
-    with open(filepath, "rb") as file:
-        await callback_query.message.answer_document(
-            document=file,
-            caption="📁 Your BIN Bank purchase log"
-        )
+    file = FSInputFile(filepath)
+    await callback_query.message.answer_document(
+        document=file,
+        caption="📁 Your BIN Bank purchase log"
+    )
 
 @router.callback_query(F.data == "run_autobuy")
 async def handle_run_autobuy(callback: CallbackQuery):
