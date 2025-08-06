@@ -242,6 +242,7 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="bins_of_interest")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="autobuy_bins")],
         [InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy")],
+        [InlineKeyboardButton(text="⏹️ Stop Autobuy", callback_data="stop_autobuy")],
         [InlineKeyboardButton(text="🏦 BIN Bank", callback_data="send_bin_bank")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
@@ -268,12 +269,28 @@ async def send_bin_bank_file(callback_query: types.CallbackQuery):
 @router.callback_query(F.data == "run_autobuy")
 async def handle_run_autobuy(callback: CallbackQuery):
     user_id = callback.from_user.id
-    await callback.message.edit_text("⏳ Running autobuy...")
 
-    result_message = await run_autobuy(user_id)
+    if user_id in user_autobuy_tasks and not user_autobuy_tasks[user_id].done():
+        await callback.answer("⚠️ Autobuy is already running.", show_alert=True)
+        return
 
-    # Just send the text result, no file
-    await callback.message.edit_text(result_message)
+    await callback.message.edit_text("⏳ Starting autobuy... Please wait.", reply_markup=start_stop_kb)
+
+    task = asyncio.create_task(autobuy_loop(user_id, callback))
+    user_autobuy_tasks[user_id] = task
+
+
+@router.callback_query(F.data == "stop_autobuy")
+async def handle_stop_autobuy(callback: CallbackQuery):
+    user_id = callback.from_user.id
+
+    task = user_autobuy_tasks.get(user_id)
+    if task:
+        task.cancel()
+        del user_autobuy_tasks[user_id]
+    else:
+        await callback.answer("⚠️ Autobuy is not running.", show_alert=True)
+
     
 @router.callback_query(F.data == "bins_of_interest")
 async def show_bins_of_interest(callback: CallbackQuery, state: FSMContext):
