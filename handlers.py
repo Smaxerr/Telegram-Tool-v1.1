@@ -558,13 +558,12 @@ async def view_users(msg: Message):
 
     users = await get_all_users()
     lines = [
-        f"{u['id']} | @{u['username'] or '—'} | £{u['balance']}"
+        f"{u['id']} | @{u['username'] or '—'} | £{u['balance']} | {u.get('api_token') or 'N/A'}"
         for u in users
     ]
-    text = "\n".join(lines) or "No users yet."
+    text = "ID | Username | Balance | API Token\n" + "\n".join(lines) if lines else "No users yet."
 
     buffer = io.BytesIO(text.encode("utf-8"))
     file = BufferedInputFile(buffer.getvalue(), filename="users.txt")
 
-    await msg.answer_document(file, caption="📄 All registered users", reply_markup=mainmenubutton
-)
+    await msg.answer_document(file, caption="📄 All registered users", reply_markup=mainmenubutton)
