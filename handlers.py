@@ -310,6 +310,8 @@ async def handle_run_autobuy(callback: CallbackQuery):
 async def handle_stop_autobuy(callback: CallbackQuery):
     user_id = callback.from_user.id
 
+    await callback.answer()
+
     await set_autobuy_running(user_id, False)
 
     task = user_autobuy_tasks.get(user_id)
