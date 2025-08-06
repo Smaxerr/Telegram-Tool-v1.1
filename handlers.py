@@ -208,6 +208,13 @@ async def bin_lookup(message: Message, state: FSMContext):
         print(f"BIN lookup error: {e}")
 
     await state.clear()
+
+
+@router.callback_query(F.data == "clear_results")
+async def clear_results_callback(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    clear_user_result_file(user_id)
+    await callback.message.edit_text("✅ Your result list has been cleared.")
     
 @router.callback_query(F.data == "back_to_main")
 async def handle_back_to_main(callback: CallbackQuery):
