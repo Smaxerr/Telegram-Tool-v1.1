@@ -15,10 +15,6 @@ async def init_db_pool():
                 ovo_id TEXT
             );
         """)
-        await conn.execute("""
-            ALTER TABLE users
-            ADD COLUMN IF NOT EXISTS bins_of_interest TEXT DEFAULT '';
-        """)
 
 async def get_user(user_id):
     async with pool.acquire() as conn:
