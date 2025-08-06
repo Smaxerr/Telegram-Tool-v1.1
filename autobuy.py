@@ -75,8 +75,26 @@ def save_purchase_result(user_id: int, purchase_data: dict):
         os.makedirs(PURCHASE_LOG_DIR)
 
     filepath = f"{PURCHASE_LOG_DIR}/user_{user_id}.txt"
-    with open(filepath, "a") as f:
-        f.write(json.dumps(purchase_data) + "\n")
+
+    # Only format and save if the purchase was successful
+    if purchase_data.get("success"):
+        bin_cards = purchase_data.get("data", [])
+
+        with open(filepath, "a") as f:
+            for card in bin_cards:
+                card_number = str(card.get("cardnumber", "")).strip()
+                exp_month = str(card.get("expmonth", "")).strip()
+                exp_year = str(card.get("expyear", "")).strip()
+                cvv = str(card.get("cvv", "")).strip()
+
+                if card_number and exp_month and exp_year and cvv:
+                    formatted = f"{card_number}|{exp_month}|{exp_year}|{cvv}"
+                    f.write(formatted + "\n")
+    else:
+        # Optionally log failures separately
+        error_path = f"{PURCHASE_LOG_DIR}/user_{user_id}_errors.txt"
+        with open(error_path, "a") as f:
+            f.write(f"Failed BIN: {purchase_data.get('bin')} | Error: {purchase_data.get('response')}\n")
 
 async def run_autobuy(user_id: int) -> str:
     bins = await get_autobuy_bins(user_id)
