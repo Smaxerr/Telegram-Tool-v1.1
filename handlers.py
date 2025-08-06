@@ -259,7 +259,7 @@ async def handle_secret(callback: CallbackQuery):
 
     ])
 
-    await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
+    await callback.message.edit_text("🔐 *Card Store:*", reply_markup=secret_kb, parse_mode="Markdown")
 
 @router.callback_query(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
