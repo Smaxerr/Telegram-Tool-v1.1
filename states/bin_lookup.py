@@ -14,3 +14,7 @@ class APITokenStates(StatesGroup):
 class BINInterestStates(StatesGroup):
     waiting_for_bin_add = State()
     waiting_for_bin_remove = State()
+
+class AutobuyStates(StatesGroup):
+    waiting_for_autobuy_bin_add = State()
+    waiting_for_autobuy_bin_remove = State()
