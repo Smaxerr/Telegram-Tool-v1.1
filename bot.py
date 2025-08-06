@@ -8,11 +8,11 @@ from aiogram.types import MenuButtonCommands, BotCommand
 
 from check_bins import check_bins_loop
 
-async def on_startup(dispatcher):
-    # Start your background task here
+
+async def on_startup(bot: Bot):
+    # Start your background task here, pass the bot instance
     asyncio.create_task(check_bins_loop(bot))
 
-dp.startup.register(on_startup)
 
 async def main():
     await init_db_pool()
@@ -30,7 +30,11 @@ async def main():
         # Add other commands here if needed
     ])
 
+    # Call your startup logic here *after* bot and dp are defined
+    await on_startup(bot)
+
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
