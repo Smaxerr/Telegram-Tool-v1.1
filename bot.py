@@ -6,6 +6,14 @@ from database import init_db_pool
 
 from aiogram.types import MenuButtonCommands, BotCommand
 
+from check_bins import check_bins_loop
+
+async def on_startup(dispatcher):
+    # Start your background task here
+    asyncio.create_task(check_bins_loop(bot))
+
+dp.startup.register(on_startup)
+
 async def main():
     await init_db_pool()
     bot = Bot(BOT_TOKEN)
