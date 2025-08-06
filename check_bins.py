@@ -6,7 +6,7 @@ import time
 from aiogram import Bot
 from database import get_all_users, get_api_token
 
-CHECK_INTERVAL = 5  # seconds between checks
+CHECK_INTERVAL = 30  # seconds between checks
 NOTIFY_COOLDOWN = 3600  # 60 minutes cooldown in seconds
 
 last_notified = {}
@@ -34,32 +34,25 @@ async def fetch_bin_availability(token: str, bin_code: str) -> int:
             return count
 
 async def check_bins_loop(bot: Bot):
-    logging.info("check_bins_loop started")
     while True:
-        logging.info("Checking bins of interest...")
         users = await get_all_users()
-        logging.info(f"Loaded {len(users)} users")
 
         for user in users:
             user_id = user['id']
             api_token = await get_api_token(user_id)
             if not api_token:
-                logging.info(f"User {user_id} missing api_token, skipping")
                 continue
 
             bins_raw = user.get("bins_of_interest", "")
             bins = [b.strip() for b in bins_raw.split(",") if b.strip()]
-            logging.info(f"User {user_id} bins_of_interest: {bins}")
 
             for bin_code in bins:
                 count = await fetch_bin_availability(api_token, bin_code)
-                logging.info(f"User {user_id} bin {bin_code} count: {count}")
                 if count > 0:
                     key = (user_id, bin_code)
                     now = time.time()
                     last_time = last_notified.get(key, 0)
                     if now - last_time < NOTIFY_COOLDOWN:
-                        logging.info(f"User {user_id} already notified about bin {bin_code} recently")
                         continue
                     last_notified[key] = now
                     logging.info(f"Notifying user {user_id} about bin {bin_code} availability")
