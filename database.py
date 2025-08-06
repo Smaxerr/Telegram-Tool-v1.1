@@ -16,11 +16,8 @@ async def init_db_pool():
             );
         """)
         await conn.execute("""
-            CREATE TABLE IF NOT EXISTS bins_of_interest (
-                user_id BIGINT REFERENCES users(id),
-                bin TEXT,
-                PRIMARY KEY (user_id, bin)
-            );
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS bins_of_interest TEXT DEFAULT '';
         """)
 
 async def get_user(user_id):
@@ -88,3 +85,30 @@ async def get_api_token(user_id: int) -> str | None:
         if row and row['api_token']:
             return row['api_token']
         return None
+
+async def get_bins_of_interest(user_id: int) -> list[str]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT bins_of_interest FROM users WHERE id = $1", user_id)
+        if not row or not row['bins_of_interest']:
+            return []
+        return row['bins_of_interest'].split(',')
+
+async def set_bins_of_interest(user_id: int, bins: list[str]):
+    value = ",".join(bins)
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET bins_of_interest = $1 WHERE id = $2",
+            value, user_id
+        )
+
+async def add_bin_of_interest(user_id: int, bin_code: str):
+    bins = await get_bins_of_interest(user_id)
+    if bin_code not in bins:
+        bins.append(bin_code)
+        await set_bins_of_interest(user_id, bins)
+
+async def remove_bin_of_interest(user_id: int, bin_code: str):
+    bins = await get_bins_of_interest(user_id)
+    if bin_code in bins:
+        bins.remove(bin_code)
+        await set_bins_of_interest(user_id, bins)
