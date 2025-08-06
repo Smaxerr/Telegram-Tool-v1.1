@@ -2,10 +2,24 @@ import aiohttp
 import json
 import os
 
+import asyncio
+
+user_autobuy_tasks = {}
+
 from check_bins import fetch_bin_availability
 from database import get_api_token, get_autobuy_bins
 
 PURCHASE_LOG_DIR = "./purchases"
+
+async def autobuy_loop(user_id: int, callback: CallbackQuery):
+    try:
+        while True:
+            result_message = await run_autobuy(user_id)
+            await callback.message.edit_text(result_message)
+            await asyncio.sleep(30)  # Wait for 30 seconds before the next run
+    except asyncio.CancelledError:
+        await callback.message.edit_text("⏹️ Autobuy stopped.")
+
 
 async def purchase_bin(api_token: str, bin_code: str, count: int) -> dict:
     url = "https://api.razershop.cc/api/purchase"
