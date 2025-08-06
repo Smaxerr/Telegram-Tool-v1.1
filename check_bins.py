@@ -20,6 +20,7 @@ async def fetch_bins_data(token: str):
             return await resp.json()
 
 async def check_bins_loop(bot: Bot):
+    logging.info("check_bins_loop started")
     while True:
         logging.info("Checking bins of interest...")
         users = await get_all_users()
