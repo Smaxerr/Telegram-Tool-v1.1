@@ -3,6 +3,9 @@ from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN
 from handlers import router
 from database import init_db_pool
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 from aiogram.types import MenuButtonCommands, BotCommand
 
