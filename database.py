@@ -140,3 +140,19 @@ async def remove_autobuy_bin(user_id: int, bin_code: str):
     if bin_code in bins:
         bins.remove(bin_code)
         await set_autobuy_bins(user_id, bins)
+
+async def set_autobuy_running(user_id: int, status: bool):
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET autobuy_running = $1 WHERE id = $2",
+            status,
+            user_id
+        )
+
+async def get_autobuy_running(user_id: int) -> bool:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT autobuy_running FROM users WHERE id = $1",
+            user_id
+        )
+        return row["autobuy_running"] if row and row["autobuy_running"] is not None else False
