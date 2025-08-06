@@ -119,7 +119,7 @@ async def run_autobuy(user_id: int) -> str:
             })
 
     if not purchased_bins:
-        return "⚠️ No BINs were purchased."
+        return ""
 
     # Build summary message
     summary_lines = [f"✅ Purchased BINs:"]
