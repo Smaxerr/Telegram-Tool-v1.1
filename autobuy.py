@@ -62,8 +62,6 @@ async def autobuy_loop(user_id: int, callback: CallbackQuery):
                 await callback.message.answer(result_message)
 
             await asyncio.sleep(30)
-    except asyncio.CancelledError:
-        await callback.message.answer("⏹️ Autobuy stopped.", reply_markup=mainmenubutton)
 
 async def start_autobuy_loop(user_id: int, callback: CallbackQuery):
     # Cancel existing task if running
