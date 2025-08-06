@@ -4,23 +4,20 @@ from config import BOT_TOKEN
 from handlers import router
 from database import init_db_pool
 import logging
+from aiogram.types import MenuButtonCommands, BotCommand
+from check_bins import check_bins_loop
 
 logging.basicConfig(level=logging.INFO)
 
-from aiogram.types import MenuButtonCommands, BotCommand
+bot = Bot(BOT_TOKEN)        # create global bot instance
+dp = Dispatcher()           # create global dispatcher instance
 
-from check_bins import check_bins_loop
-
-
-async def on_startup(bot: Bot):
-    # Start your background task here, pass the bot instance
+async def on_startup():
+    # Start your background task here, you can use global bot
     asyncio.create_task(check_bins_loop(bot))
-
 
 async def main():
     await init_db_pool()
-    bot = Bot(BOT_TOKEN)
-    dp = Dispatcher()
     dp.include_router(router)
 
     # Set default menu button to show bot commands like /start
@@ -33,11 +30,9 @@ async def main():
         # Add other commands here if needed
     ])
 
-    # Call your startup logic here *after* bot and dp are defined
-    await on_startup(bot)
+    await on_startup()
 
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
