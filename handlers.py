@@ -276,7 +276,7 @@ async def handle_run_autobuy(callback: CallbackQuery):
         await callback.answer("⚠️ Autobuy is already running.", show_alert=True)
         return
 
-    await callback.message.edit_text("⏳ Starting autobuy... Please wait.")
+    await callback.message.edit_text("⏳ Autobuy is now active.", reply_markup=mainmenubutton)
 
     task = asyncio.create_task(autobuy_loop(user_id, callback))
     user_autobuy_tasks[user_id] = task
