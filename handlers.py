@@ -8,6 +8,7 @@ from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 import asyncio
 from keyboards import mainmenubutton
+from database import get_autobuy_running
 from autobuy import run_autobuy, start_autobuy_loop, stop_autobuy_loop, user_autobuy_tasks, autobuy_loop
 from aiogram.fsm.state import StatesGroup, State
 from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bin_of_interest, remove_bin_of_interest, get_autobuy_bins, set_autobuy_bins, add_autobuy_bin, remove_autobuy_bin
@@ -259,7 +260,15 @@ async def handle_secret(callback: CallbackQuery):
 
     ])
 
-    await callback.message.edit_text("🔐 *Card Store:*", reply_markup=secret_kb, parse_mode="Markdown")
+        is_running = await get_autobuy_running(user_id)
+        status = "✅ AutoBuy - ON" if is_running else "❌ AutoBuy - OFF"
+    
+        await callback.message.edit_text(
+            f"🔐 *Card Store:*\n\n{status}",
+            reply_markup=secret_kb,
+            parse_mode="Markdown"
+        )
+
 
 @router.callback_query(lambda c: c.data == "send_bin_bank")
 async def send_bin_bank_file(callback_query: types.CallbackQuery):
@@ -279,6 +288,7 @@ async def send_bin_bank_file(callback_query: types.CallbackQuery):
 
 @router.callback_query(F.data == "run_autobuy")
 async def handle_run_autobuy(callback: CallbackQuery):
+    await set_autobuy_running(user_id, True)
     user_id = callback.from_user.id
 
     if user_id in user_autobuy_tasks and not user_autobuy_tasks[user_id].done():
@@ -293,6 +303,7 @@ async def handle_run_autobuy(callback: CallbackQuery):
 
 @router.callback_query(F.data == "stop_autobuy")
 async def handle_stop_autobuy(callback: CallbackQuery):
+    await set_autobuy_running(user_id, False)
     user_id = callback.from_user.id
 
     task = user_autobuy_tasks.get(user_id)
