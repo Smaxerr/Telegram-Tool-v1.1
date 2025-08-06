@@ -205,7 +205,18 @@ async def bin_lookup(message: Message, state: FSMContext):
     
 @router.callback_query(F.data == "back_to_main")
 async def handle_back_to_main(callback: CallbackQuery):
-    await callback.message.edit_text("🏠 Main Menu", reply_markup=main_menu())
+    user_id = callback.from_user.id
+    user_name = callback.from_user.first_name
+    balance = await get_balance(user_id)  # Replace with your actual balance fetch
+
+    text = (
+        f"💻 Welcome to CypherBot, {user_name}.\n\n"
+        f"💰 You have {balance} credits remaining.\n\n"
+        "Use the menu below to continue."
+    )
+
+    await callback.message.edit_text(text, reply_markup=main_menu())
+
 
 @router.callback_query(F.data == "settings")
 async def settings_placeholder(callback: CallbackQuery, state: FSMContext):
