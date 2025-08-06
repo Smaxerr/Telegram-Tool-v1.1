@@ -17,8 +17,9 @@ async def init_db_pool():
         """)
         await conn.execute("""
             ALTER TABLE users
-            ADD COLUMN IF NOT EXISTS autobuy_bins TEXT DEFAULT '';
+            ADD COLUMN IF NOT EXISTS autobuy_running BOOLEAN DEFAULT FALSE;
         """)
+
         
 async def get_user(user_id):
     async with pool.acquire() as conn:
