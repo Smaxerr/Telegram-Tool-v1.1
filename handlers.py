@@ -7,7 +7,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
 from aiogram.fsm.state import StatesGroup, State
-from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bins_of_interest, remove_bins_of_interest
+from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest
 from states.bin_lookup import OvoStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
