@@ -22,7 +22,6 @@ async def fetch_bin_availability(token: str, bin_code: str) -> int:
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as resp:
             if resp.status != 200:
-                logging.warning(f"API request failed with status {resp.status} for bin {bin_code}")
                 return 0
             data = await resp.json()
             if not data:
@@ -55,7 +54,6 @@ async def check_bins_loop(bot: Bot):
                     if now - last_time < NOTIFY_COOLDOWN:
                         continue
                     last_notified[key] = now
-                    logging.info(f"Notifying user {user_id} about bin {bin_code} availability")
                     await bot.send_message(user_id, f"✅ BIN {bin_code} is available with count {count}!")
 
         await asyncio.sleep(CHECK_INTERVAL)
