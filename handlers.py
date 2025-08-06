@@ -66,9 +66,6 @@ binlookupbutton = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Go Back", callback_data="go_back_from_bin")]
 ])
 
-mainmenubutton = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_main")]
-])
 
 @router.message(BinLookupState.waiting_for_bin)
 async def bin_lookup(message: Message, state: FSMContext):
