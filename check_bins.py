@@ -19,6 +19,7 @@ async def fetch_bins_data(token: str):
 
 async def check_bins_loop(bot: Bot):
     while True:
+        logging.info("Checking bins of interest...")
         users = await get_all_users()
         for user in users:
             user_id = user['id']
@@ -39,6 +40,7 @@ async def check_bins_loop(bot: Bot):
 
             for bin_info in available_bins:
                 bin_code = bin_info.get("bin")
+                logging.info(f"Checking bin: {bin_code}")
                 count = bin_info.get("count", 0)
                 if bin_code in bins and count > 0:
                     key = (user_id, bin_code)
