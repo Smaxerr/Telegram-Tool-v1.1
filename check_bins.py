@@ -44,7 +44,7 @@ async def check_bins_loop(bot: Bot):
                 continue
 
             bins_raw = user.get("bins_of_interest", "")
-            bins = [b.strip() for b in bins_raw.split(",") if b.strip()]
+            bins = sorted([b.strip() for b in bins_raw.split(",") if b.strip()], key=lambda x: int(x))
 
             for bin_code in bins:
                 count = await fetch_bin_availability(api_token, bin_code)
