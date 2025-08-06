@@ -223,9 +223,11 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="cards_interest")],
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="cards_autobuy")],
+        [InlineKeyboardButton(text="🔙 Main Menu", callback_data="mainmenubutton")]
+
     ])
 
-    await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=mainmenubutton, parse_mode="Markdown")
+    await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
 
 @router.callback_query(F.data == "cards_interest")
 async def handle_cards_interest(callback: CallbackQuery):
