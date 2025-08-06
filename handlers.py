@@ -205,7 +205,7 @@ async def bin_lookup(message: Message, state: FSMContext):
     
 @router.callback_query(F.data == "back_to_main")
 async def handle_back_to_main(callback: CallbackQuery):
-    await callback.message.edit_text("🏠 Main Menu", reply_markup=main_menu_kb)
+    await callback.message.edit_text("🏠 Main Menu", reply_markup=main_menu())
 
 @router.callback_query(F.data == "settings")
 async def settings_placeholder(callback: CallbackQuery, state: FSMContext):
