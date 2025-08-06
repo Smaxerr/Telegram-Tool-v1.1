@@ -16,7 +16,7 @@ async def autobuy_loop(user_id: int, callback: CallbackQuery):
         while True:
             result_message = await run_autobuy(user_id)
             await callback.message.edit_text(result_message)
-            await asyncio.sleep(30)  # Wait for 30 seconds before the next run
+            await asyncio.sleep(30)
     except asyncio.CancelledError:
         await callback.message.edit_text("⏹️ Autobuy stopped.")
 
