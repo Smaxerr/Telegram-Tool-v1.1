@@ -9,6 +9,7 @@ from keyboards import main_menu, back_menu
 from aiogram.fsm.state import StatesGroup, State
 from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest
 from states.bin_lookup import OvoStates
+from states.bin_lookup import BINInterestStates
 from playwright.async_api import async_playwright
 from database import set_ovo_id 
 from database import get_ovo_id
