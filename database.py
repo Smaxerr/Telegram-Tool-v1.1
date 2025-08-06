@@ -17,7 +17,7 @@ async def init_db_pool():
         """)
         await conn.execute("""
             ALTER TABLE users
-            ADD COLUMN IF NOT EXISTS ovo_id TEXT;
+            ADD COLUMN IF NOT EXISTS api_token TEXT;
         """)
 
 async def get_user(user_id):
