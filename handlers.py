@@ -243,6 +243,7 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy")],
         [InlineKeyboardButton(text="⏹️ Stop Autobuy", callback_data="stop_autobuy")],
         [InlineKeyboardButton(text="🏦 BIN Bank", callback_data="send_bin_bank")],
+        [InlineKeyboardButton(text="🗑️ Clear BIN Bank", callback_data="clear_bin_bank")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
     ])
