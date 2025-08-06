@@ -15,7 +15,11 @@ async def init_db_pool():
                 ovo_id TEXT
             );
         """)
-
+        await conn.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS autobuy_bins TEXT DEFAULT '';
+        """)
+        
 async def get_user(user_id):
     async with pool.acquire() as conn:
         user = await conn.fetchrow("SELECT * FROM users WHERE id = $1", user_id)
@@ -108,3 +112,30 @@ async def remove_bin_of_interest(user_id: int, bin_code: str):
     if bin_code in bins:
         bins.remove(bin_code)
         await set_bins_of_interest(user_id, bins)
+
+async def get_autobuy_bins(user_id: int) -> list[str]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT autobuy_bins FROM users WHERE id = $1", user_id)
+        if not row or not row['autobuy_bins']:
+            return []
+        return row['autobuy_bins'].split(',')
+
+async def set_autobuy_bins(user_id: int, bins: list[str]):
+    value = ",".join(bins)
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET autobuy_bins = $1 WHERE id = $2",
+            value, user_id
+        )
+
+async def add_autobuy_bin(user_id: int, bin_code: str):
+    bins = await get_autobuy_bins(user_id)
+    if bin_code not in bins:
+        bins.append(bin_code)
+        await set_autobuy_bins(user_id, bins)
+
+async def remove_autobuy_bin(user_id: int, bin_code: str):
+    bins = await get_autobuy_bins(user_id)
+    if bin_code in bins:
+        bins.remove(bin_code)
+        await set_autobuy_bins(user_id, bins)
