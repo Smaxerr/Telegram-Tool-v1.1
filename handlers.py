@@ -48,6 +48,10 @@ async def cmd_start(msg: Message):
     await msg.answer(text, parse_mode="Markdown", reply_markup=main_menu())
 
 
+def clear_user_result_file(user_id: int):
+    filepath = f"purchases/user_{user_id}.txt"
+    open(filepath, "w").close()  # Truncates the file to empty
+    
 # =========================
 # BIN Lookup Handlers
 # =========================
@@ -243,7 +247,7 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy")],
         [InlineKeyboardButton(text="⏹️ Stop Autobuy", callback_data="stop_autobuy")],
         [InlineKeyboardButton(text="🏦 BIN Bank", callback_data="send_bin_bank")],
-        [InlineKeyboardButton(text="🗑️ Clear BIN Bank", callback_data="clear_bin_bank")],
+        [InlineKeyboardButton(text="🗑️ Clear BIN Bank", callback_data="clear_results")],
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
     ])
