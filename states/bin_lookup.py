@@ -11,3 +11,6 @@ class OvoStates(StatesGroup):
 class APITokenStates(StatesGroup):
     waiting_for_api_token = State()
 
+class BINInterestStates(StatesGroup):
+    waiting_for_bin_add = State()
+    waiting_for_bin_remove = State()
