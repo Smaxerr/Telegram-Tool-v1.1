@@ -8,4 +8,6 @@ class BinLookupState(StatesGroup):
 class OvoStates(StatesGroup):
     awaiting_cards = State()
 
+class APITokenStates(StatesGroup):
+    waiting_for_api_token = State()
 
