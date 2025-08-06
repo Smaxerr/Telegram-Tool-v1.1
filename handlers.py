@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
+from autobuy import run_autobuy
 from aiogram.fsm.state import StatesGroup, State
 from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bin_of_interest, remove_bin_of_interest, get_autobuy_bins, set_autobuy_bins, add_autobuy_bin, remove_autobuy_bin
 from states.bin_lookup import OvoStates
@@ -240,11 +241,25 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
         [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="bins_of_interest")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="autobuy_bins")],
+        InlineKeyboardButton(text="🚀 Run Autobuy Now", callback_data="run_autobuy"),
         [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
     ])
 
     await callback.message.edit_text("🔐 *Secret Menu:*", reply_markup=secret_kb, parse_mode="Markdown")
+
+@router.callback_query(F.data == "run_autobuy")
+async def handle_run_autobuy(callback: CallbackQuery):
+    user_id = callback.from_user.id
+    await callback.message.edit_text("⏳ Running autobuy...")
+
+    result_message = await run_autobuy(user_id)
+
+    filepath = f"purchases/user_{user_id}.txt"
+    if os.path.exists(filepath):
+        await callback.message.answer_document(FSInputFile(filepath), caption=result_message)
+    else:
+        await callback.message.answer(result_message)
     
 @router.callback_query(F.data == "bins_of_interest")
 async def show_bins_of_interest(callback: CallbackQuery, state: FSMContext):
