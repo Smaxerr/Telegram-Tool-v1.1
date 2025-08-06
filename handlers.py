@@ -11,7 +11,7 @@ from keyboards import mainmenubutton
 from database import get_autobuy_running
 from autobuy import run_autobuy, start_autobuy_loop, stop_autobuy_loop, user_autobuy_tasks, autobuy_loop
 from aiogram.fsm.state import StatesGroup, State
-from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bin_of_interest, remove_bin_of_interest, get_autobuy_bins, set_autobuy_bins, add_autobuy_bin, remove_autobuy_bin
+from database import register_user, get_balance, set_balance, add_balance, get_all_users, set_api_token, get_api_token, set_bins_of_interest, get_bins_of_interest, add_bin_of_interest, remove_bin_of_interest, get_autobuy_bins, set_autobuy_bins, add_autobuy_bin, remove_autobuy_bin, set_autobuy_running
 from states.bin_lookup import OvoStates
 from states.bin_lookup import BINInterestStates
 from states.bin_lookup import AutobuyStates
