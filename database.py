@@ -16,8 +16,11 @@ async def init_db_pool():
             );
         """)
         await conn.execute("""
-            ALTER TABLE users
-            ADD COLUMN IF NOT EXISTS api_token TEXT;
+            CREATE TABLE IF NOT EXISTS bins_of_interest (
+                user_id BIGINT REFERENCES users(id),
+                bin TEXT,
+                PRIMARY KEY (user_id, bin)
+            );
         """)
 
 async def get_user(user_id):
