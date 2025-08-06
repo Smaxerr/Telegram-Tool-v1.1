@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from states.bin_lookup import BinLookupState
 from keyboards import main_menu, back_menu
+import asyncio
 
 from autobuy import run_autobuy, start_autobuy_loop, stop_autobuy_loop, user_autobuy_tasks
 from aiogram.fsm.state import StatesGroup, State
