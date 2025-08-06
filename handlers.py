@@ -202,6 +202,10 @@ async def bin_lookup(message: Message, state: FSMContext):
         print(f"BIN lookup error: {e}")
 
     await state.clear()
+    
+@router.callback_query(F.data == "back_to_main")
+async def handle_back_to_main(callback: CallbackQuery):
+    await callback.message.edit_text("🏠 Main Menu", reply_markup=main_menu_kb)
 
 @router.callback_query(F.data == "settings")
 async def settings_placeholder(callback: CallbackQuery, state: FSMContext):
@@ -223,7 +227,7 @@ async def handle_secret(callback: CallbackQuery):
         [InlineKeyboardButton(text="💳 Cards of Interest", callback_data="cards_interest")],
         [InlineKeyboardButton(text="🔑 API Token", callback_data="api_token")],
         [InlineKeyboardButton(text="🛒 Cards to Autobuy", callback_data="cards_autobuy")],
-        [InlineKeyboardButton(text="🔙 Main Menu", callback_data="mainmenubutton")]
+        [InlineKeyboardButton(text="🔙 Main Menu", callback_data="back_to_main")]
 
     ])
 
