@@ -48,8 +48,7 @@ async def run_autobuy(user_id: int) -> str:
     if not bins:
         return "❌ You haven't added any BINs to autobuy."
 
-    successful = 0
-    failed = 0
+    purchased_bins = []  # Will store tuples like (bin_code, count)
 
     for bin_code in bins:
         try:
@@ -74,18 +73,25 @@ async def run_autobuy(user_id: int) -> str:
                 "data": all_data,
                 "success": True
             })
-            successful += 1
+
+            # Add purchased count for this BIN
+            purchased_bins.append((bin_code, available_count))
+
         except Exception as e:
             save_purchase_result(user_id, {
                 "bin": bin_code,
                 "response": str(e),
                 "success": False
             })
-            failed += 1
 
-    return (
-        f"✅ Autobuy completed!\n"
-        f"🟢 Success: {successful}\n"
-        f"🔴 Failed: {failed}\n"
-        f"📁 Log saved to: purchases/user_{user_id}.txt"
-    )
+    if not purchased_bins:
+        return "⚠️ No BINs were purchased."
+
+    # Build summary message
+    summary_lines = [f"✅ Purchased BINs:"]
+    for bin_code, count in purchased_bins:
+        summary_lines.append(f"• BIN {bin_code}: {count} purchased")
+
+    summary_lines.append("📁 Saved to BIN Bank.")
+
+    return "\n".join(summary_lines)
