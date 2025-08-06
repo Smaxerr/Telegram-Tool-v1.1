@@ -67,3 +67,21 @@ async def get_ovo_id(user_id: int) -> str | None:
         if row and row['ovo_id']:
             return row['ovo_id']
         return None
+
+async def set_api_token(user_id: int, token: str):
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET api_token = $1 WHERE id = $2",
+            token,
+            user_id
+        )
+
+async def get_api_token(user_id: int) -> str | None:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT api_token FROM users WHERE id = $1",
+            user_id
+        )
+        if row and row['api_token']:
+            return row['api_token']
+        return None
