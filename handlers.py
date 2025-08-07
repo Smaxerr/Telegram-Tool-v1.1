@@ -476,7 +476,7 @@ async def process_remove_autobuy_bin(msg: Message, state: FSMContext):
     await remove_autobuy_bin(msg.from_user.id, bin_code)
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="➕ Add BIN", callback_data="add_autobuy_bin")],
+        [InlineKeyboardButton(text="➖ Remove BIN", callback_data="remove_autobuy_bin")],
         [InlineKeyboardButton(text="⬅️ Back to Menu", callback_data="back_to_main")]
     ])
 
